@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+
+
+<mapper namespace="com.myplacc.service.impl.LoginDaoMapper">
+
+	<cache eviction="LRU" flushInterval="60000" size="512" readOnly="true" />
+
+
+	<resultMap id="getSessionResult" type="Session" autoMapping="true">
+		<id column="code" property="code"/>
+		<result property="scopes" column="scopes" typeHandler="TextArrayTypeHandler" />
+		<association property="useracc" javaType="Useracc">
+			<id property="id" column="useracc" />
+		</association>		
+	</resultMap>
+	<resultMap id="getUseraccResult" type="Useracc" autoMapping="true">
+		<result property="scopes" column="scopes" typeHandler="TextArrayTypeHandler" />
+	</resultMap>
+	<select id="getSession" resultType="Session" resultMap="getSessionResult">
+		SELECT * FROM session where
+		code=#{code} and valid=1
+	</select>
+	<select id="getSessionForUser" resultType="Session" resultMap="getSessionResult">
+		SELECT * FROM session where useracc = #{id}
+	</select>
+	<select id="getSessionWithoutLocation" resultType="Session" resultMap="getSessionResult">
+		SELECT * FROM session where valid=1 and location is null offset 0 limit 1000
+	</select>
+	
+	<select id="getUseraccByLogin" resultType="Useracc" resultMap="getUseraccResult">
+		SELECT * FROM useracc where
+		login=#{login} and status=1
+	</select>
+	<select id="getUseraccByEmail" resultType="Useracc" resultMap="getUseraccResult">
+		SELECT * FROM useracc where
+		email=#{email} and status=1
+	</select>	
+	<insert id="insertSession" keyProperty="code"
+		keyColumn="code" parameterType="Session">
+		INSERT INTO session (
+		code,
+		scopes,
+		valid,
+		remote_ip,
+		user_agent,
+		expire_date,
+		language,
+		create_dt,
+		last_ping,
+		hash,
+		lon,
+		lat
+		) values (
+		#{code},
+        #{scopes,javaType=String[],jdbcType=OTHER,typeHandler=TextArrayTypeHandler}, 
+		#{valid},
+		#{remoteIp},
+		#{userAgent},
+		#{expireDate},
+		#{language},
+		now(),
+		#{lastPing},
+		#{hash},
+		#{lon},
+		#{lat}
+		)
+	</insert>
+	<update id="updateFingerprint" keyProperty="code"
+		keyColumn="code" parameterType="Session">
+		update session set 
+		fingerprint=#{fingerprint} 
+		 where code=#{code}
+	</update>
+	<select id="getSessionFingerprint" resultMap="getSessionResult">
+		SELECT * FROM session where fingerprint=#{fingerprint} and valid=1 and useracc is null
+	</select>
+	
+	<update id="updateSession" keyProperty="code"
+		keyColumn="code" parameterType="Session">
+		update session set 
+		last_ping=#{lastPing},
+		country=#{country},
+		city=#{city},
+		location=#{location},
+		lon=#{lon},
+		lat=#{lat},
+		scopes= #{scopes,javaType=String[],jdbcType=OTHER,typeHandler=TextArrayTypeHandler},
+		fingerprint=#{fingerprint},
+		useracc = #{useracc.id}
+		 where code=#{code}
+	</update>
+	
+</mapper>

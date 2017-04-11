@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<settings>
+		<setting name="jdbcTypeForNull" value="OTHER" />
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+	</settings>
+
+	<typeAliases>
+		<typeAlias alias="Langtext"
+			type="com.myplacc.domain.dictionary.Langtext" />
+		<typeAlias alias="LangtextRq"
+			type="com.myplacc.domain.dictionary.LangtextRq" />
+		<typeAlias alias="Session" type="com.myplacc.domain.user.Session" />
+		<typeAlias alias="Useracc" type="com.myplacc.domain.user.Useracc" />
+		
+		
+		<typeAlias alias="SearchResult" type="com.myplacc.domain.search.SearchResult" />
+		
+		
+		<typeAlias alias="Image" type="com.myplacc.domain.image.Image" />
+		<typeAlias alias="Comment" type="com.myplacc.domain.comment.Comment" />
+
+		<typeAlias alias="UUID" type="java.util.UUID" />
+		<typeAlias alias="String[]" type="[Ljava.lang.String;" />
+		<typeAlias alias="UUIDTypeHandler"
+			type="com.manniwood.mmpt.typehandlers.UUIDTypeHandler" />
+		<typeAlias alias="IntegerArrayTypeHandler"
+			type="com.manniwood.mmpt.typehandlers.IntegerArrayTypeHandler" />
+		<typeAlias alias="BigIntArrayTypeHandler"
+			type="com.manniwood.mmpt.typehandlers.BigIntArrayTypeHandler" />
+		<typeAlias alias="SmallIntArrayTypeHandler"
+			type="com.manniwood.mmpt.typehandlers.SmallIntArrayTypeHandler" />
+		<typeAlias alias="TextArrayTypeHandler"
+			type="com.manniwood.mmpt.typehandlers.TextArrayTypeHandler" />
+			
+		<typeAlias alias="InstantHandler" type="com.github.javaplugs.mybatis.InstantHandler" />
+		<typeAlias alias="LocalDateHandler" type="com.github.javaplugs.mybatis.LocalDateHandler" />
+		<typeAlias alias="LocalDateTimeHandler" type="com.github.javaplugs.mybatis.LocalDateTimeHandler" />
+		<typeAlias alias="LocalTimeHandler" type="com.github.javaplugs.mybatis.LocalTimeHandler" />
+		<typeAlias alias="OffsetDateTimeHandler" type="com.github.javaplugs.mybatis.OffsetDateTimeHandler" />
+		<typeAlias alias="ZonedDateTimeHandler" type="com.github.javaplugs.mybatis.ZonedDateTimeHandler" />
+		
+		
+		<typeAlias alias="Tag" type="com.myplacc.domain.tag.Tag" />
+		<typeAlias alias="Subscription" type="com.myplacc.domain.user.Subscription" />
+		
+		<!-- my placc types -->
+		<typeAlias alias="Company" type="com.myplacc.domain.company.Company" />
+		<typeAlias alias="Building" type="com.myplacc.domain.company.Building" />
+		<typeAlias alias="Level" type="com.myplacc.domain.company.Level" />
+		<typeAlias alias="Seat" type="com.myplacc.domain.company.Seat" />
+		
+		
+			
+		<!--  filter types -->
+		
+	</typeAliases>
+
+
+	<typeHandlers>
+		<package name="com.manniwood.mmpt.typehandlers" />
+	</typeHandlers>
+
+	<plugins>
+		<plugin interceptor="com.myplacc.service.impl.MyBatisQueryInterceptor" />
+	</plugins>
+
+
+	<!-- <mappers> <mapper resource="eu/dorsum/webtrader/domain/mybatis/ClientService.xml" 
+		/> </mappers> -->
+
+</configuration>
+

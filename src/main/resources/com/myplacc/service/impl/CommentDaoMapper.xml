@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace="com.myplacc.service.impl.CommentDaoMapper">
+
+	<cache eviction="LRU" flushInterval="60000" size="512" readOnly="true" />
+
+	<resultMap id="commentResult" type="Comment">
+		<result column="cid" property="id" />
+		<result column="comment" property="comment" />
+		<result column="cdate" property="createdt" />
+		<result column="scode" property="session" />
+		<association column="ori" property="original" javaType="Comment">
+			<id column="ori" property="id"/>
+		</association>		
+<!-- 		<association column="qid" property="question" javaType="Question"> -->
+<!-- 			<id column="qid" property="id"/> -->
+<!-- 		</association> -->
+		<association property="useracc" javaType="Useracc">
+			<id column="uid" property="id"/>
+			<result column="uname" property="name" />
+			<result column="uhash" property="hash" />
+			<result column="uimage" property="image" />
+			<result column="cimage" property="imagec" />
+		</association>
+	</resultMap>
+
+	<sql id="commentSql">
+		select comment.id as cid,
+		comment.comment as comment,
+		comment.question as qid,
+		comment.create_dt as cdate,
+		comment.original as ori,
+		session.hash as scode,
+		useracc.id as uid,
+		useracc.name as uname,
+		useracc.hash as uhash,
+		useracc.image as uimage,
+		useracc.imagec as cimage
+		from comment, session
+		left join useracc on session.useracc=useracc.id
+		where comment.status=1 
+		and comment.session=session.code
+	</sql>
+	
+	
+	<select id="findForQuestion" resultMap="commentResult">
+		<include refid="commentSql"></include>
+		and comment.question=#{qid} order by comment.id desc
+	</select>
+	<select id="findOne" resultMap="commentResult">
+		<include refid="commentSql"></include>
+		and comment.id=#{qid}
+	</select>
+	<select id="findRecent" resultMap="commentResult">
+		<![CDATA[
+		select comment.id as cid,
+		comment.comment as comment,
+		comment.question as qid,
+		comment.create_dt as cdate,
+		comment.original as ori,
+		session.hash as scode,
+		useracc.id as uid,
+		useracc.name as uname,
+		useracc.hash as uhash,
+		useracc.image as uimage,
+		useracc.imagec as cimage
+		from comment, question, session
+		left join useracc on session.useracc=useracc.id 
+		where comment.status=1 
+		and question.status=100 and comment.question=question.id and question.ticket is null
+		and comment.session=session.code
+		and DATE_PART('day', now() - comment.create_dt) <= 2
+		order by comment.id desc limit 10
+		]]>
+	</select>	
+	<insert id="insertComment" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Comment">
+		INSERT INTO comment (
+		comment,
+		question,
+		session,
+		status,
+		original
+		)
+		
+		values (
+		#{comment},
+		#{question.id},
+		#{session},
+		#{status},
+		#{original.id}
+		)
+	</insert>
+	<update id="updateComment" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Comment">
+		update comment 
+		set comment=#{comment},
+			create_dt=now(),
+			question=#{question.id},
+			original=#{original.id},
+			status=#{status}
+		where 
+		id=#{id}
+	</update>
+	
+
+</mapper>

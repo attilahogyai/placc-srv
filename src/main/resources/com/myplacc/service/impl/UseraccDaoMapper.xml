@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace="com.myplacc.service.impl.UseraccDaoMapper">
+
+	<cache eviction="LRU" flushInterval="60000" size="512" readOnly="true" />
+
+	<resultMap id="useraccResult" type="Useracc" autoMapping="true">
+		<result property="image" column="image"/>
+		<result property="scopes" column="scopes" typeHandler="TextArrayTypeHandler" />
+		<result property="imagec" column="imagec"/>
+		<result property="email" column="email"/>
+		<result property="name" column="name"/>
+	</resultMap>
+
+	<sql id="useraccSql">
+		select * from useracc 
+	</sql>
+	<select id="encodePassword" resultType="java.lang.String">
+		select  crypt(#{password}, gen_salt('md5'))
+	</select>
+	<select id="checkPassword" resultType="java.lang.String">
+		select  crypt(#{password}, #{encPassword})
+	</select>
+	<insert id="insertUser" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Useracc">
+		INSERT INTO useracc (
+		login,
+		email,
+		name,
+		password,
+		scopes,
+		status,
+		provider,
+		hash,
+		private_code,
+		modify_dt
+		) values (
+		#{login},
+		#{email},
+		#{name},	
+		#{password},
+	    #{scopes,javaType=String[],jdbcType=OTHER,typeHandler=TextArrayTypeHandler},
+	    #{status},
+	    #{provider},
+		#{hash},	
+		#{privateCode},    
+	    now())
+	</insert>
+	
+	
+	<update id="updateUser" keyProperty="id"
+		keyColumn="id" parameterType="Useracc">
+		update useracc set
+		name = #{name},
+		pw_change_request = #{pwChangeRequest},
+		status = #{status},
+		password = #{password},
+		modify_dt = now(),
+		imagec = #{imagec},
+		image = #{image},
+		email = #{email}
+		where id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="Useracc">
+		delete from useracc where id=#{id}
+	</delete>
+
+	<select id="findByPrivateCodeAndEmail" resultType="Useracc" resultMap="useraccResult">
+		<include refid="useraccSql"></include>
+		where private_code=#{privateCode} and email=#{email}
+	</select>
+	<select id="findByPrivateCode" resultType="Useracc" resultMap="useraccResult">
+		<include refid="useraccSql"></include>
+		where private_code=#{privateCode}
+	</select>
+	<select id="findOne" resultType="Useracc" resultMap="useraccResult">
+		<include refid="useraccSql"></include>
+		where id=#{id}
+	</select>
+	<select id="findUserForLogin" resultType="Useracc" resultMap="useraccResult">
+		<include refid="useraccSql"></include>
+		where login=#{login} and id&lt;&gt;#{eid}
+	</select>	
+	<select id="findUserForEmail" resultType="Useracc" resultMap="useraccResult">
+		<include refid="useraccSql"></include>
+		where email=#{email} and id&lt;&gt;#{eid}
+	</select>		
+	<select id="getUserAccForLoginAndPwRequest" resultType="Useracc" resultMap="useraccResult">
+		<include refid="useraccSql"></include>
+		where email=#{email} and pw_change_request=#{pwChangeRequestId}
+	</select>
+	
+	
+</mapper>

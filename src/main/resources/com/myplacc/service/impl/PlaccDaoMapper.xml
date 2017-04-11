@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace="com.myplacc.service.impl.PlaccDaoMapper">
+
+	<cache eviction="LRU" flushInterval="60000" size="512" readOnly="true" />
+
+	<resultMap id="companyResult" type="Company" autoMapping="true">
+		<result column="cid" property="id" />
+		<result column="cname" property="name" />
+		<result column="cimg" property="img" />
+		<collection property="building" ofType="Building" notNullColumn="bid">
+			<id property="id" column="bid"/>
+			<result property="name" column="bname"/>
+			<result property="img" column="bimg"/>
+			<association property="company" javaType="Company">
+				<id property="id" column="cid" />
+			</association>		
+		</collection>
+	</resultMap>
+
+	<resultMap id="buildingResult" type="Building" autoMapping="true">
+		<result column="bid" property="id" />
+		<result column="bname" property="name" />
+		<result column="bimg" property="img" />
+		<result column="baddress" property="address" />
+		<result column="bcity" property="city" />
+		<collection property="level" ofType="Level" notNullColumn="lid">
+			<id property="id" column="lid"/>
+			<result property="name" column="lname"/>
+			<result property="img" column="limg"/>
+			<result property="status" column="lstatus"/>			
+			<association property="building" javaType="Building">
+				<id property="id" column="bid" />
+			</association>		
+		</collection>
+		
+	</resultMap>
+
+	<resultMap id="levelResult" type="Level" autoMapping="true">
+		<result column="lid" property="id" />
+		<result column="lname" property="name" />
+		<result column="limg" property="img" />
+		<result property="status" column="lstatus"/>		
+		<collection property="seat" ofType="Seat" notNullColumn="sid">
+			<id property="id" column="sid"/>
+			<result property="name" column="sname"/>
+			<result property="img" column="simg"/>
+			<association property="level" javaType="Level">
+				<id property="id" column="lid" />
+			</association>		
+		</collection>
+		
+	</resultMap>
+
+
+	<sql id="companySql">
+	select c.id as cid,
+		c.name as cname,
+		c.img as cimg,
+		b.img as bimg,
+		b.id as bid,
+		b.city as bcity,
+		b.address as baddress,
+		b.name as bname
+	 from company as c left join building b on c.id=b.company
+	 where 1=1
+	</sql>
+	
+	<sql id="buildingSql">
+	select b.id as bid,
+		b.name as bname,
+		b.img as bimg,
+		b.city as bcity,
+		b.address as baddress,
+		l.img as limg,
+		l.id as lid,
+		l.name as lname
+	 from building as b join level l on b.id=l.building
+	 join company c on b.company = c.id
+	 where l.status=1
+	</sql>	
+
+	<sql id="levelSql">
+	select b.id as bid,
+		b.name as bname,
+		b.img as bimg,
+		b.city as bcity,
+		b.address as baddress,
+		
+		l.img as limg,
+		l.id as lid,
+		l.name as lname,
+		l.status as lstatus,
+		
+		s.id as sid,
+		s.name as sname,
+		s.capacity,
+		s.img
+	 from level as l join seat s on l.id=s.level
+	 join building as b on l.building=b.id
+	 where l.status=1
+	</sql>	
+
+	
+	<select id="findOneCompany" resultMap="companyResult">
+		<include refid="companySql"></include>
+		<![CDATA[
+		and c.id=#{cid}
+		]]>
+	</select>
+	<select id="findAllCompany" resultMap="companyResult">
+		<include refid="companySql"></include>
+	</select>
+
+	<select id="findOneBuilding" resultMap="buildingResult">
+		<include refid="buildingSql"></include>
+		<![CDATA[
+		and b.id=#{bid}
+		]]>
+	</select>
+
+	<select id="findOneLevel" resultMap="levelResult">
+		<include refid="levelSql"></include>
+		<![CDATA[
+		and l.id=#{bid}
+		]]>
+	</select>
+
+	
+	<insert id="insertCompany" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Company">
+		INSERT INTO company (
+		comment,
+		question,
+		session,
+		status,
+		original
+		)
+		
+		values (
+		#{comment},
+		#{question.id},
+		#{session},
+		#{status},
+		#{original.id}
+		)
+	</insert>
+	<update id="updateCompany" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Company">
+		update company 
+		set comment=#{comment},
+			create_dt=now(),
+			question=#{question.id},
+			original=#{original.id},
+			status=#{status}
+		where 
+		id=#{id}
+	</update>
+	
+
+</mapper>

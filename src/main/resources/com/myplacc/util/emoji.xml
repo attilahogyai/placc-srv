@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns="http://kefirsf.org/kefirbb/schema"
+               xsi:schemaLocation="http://kefirsf.org/kefirbb/schema http://kefirsf.org/kefirbb/schema/kefirbb-1.0.xsd">
+    <code>
+        <pattern>:)</pattern>
+        <template>&lt;i class="material-icons"&gt;mood&lt;/i&gt;</template>
+    </code>
+    <code>
+        <pattern>:-)</pattern>
+        <template>&lt;i class="material-icons"&gt;mood&lt;/i&gt;</template>
+    </code>
+    <code>
+        <pattern>:(</pattern>
+        <template>&lt;i class="material-icons"&gt;mood sad&lt;/i&gt;</template>
+    </code>
+    <code>
+        <pattern>:-(</pattern>
+        <template>&lt;i class="material-icons"&gt;mood sad&lt;/i&gt;</template>
+    </code>
+</configuration>

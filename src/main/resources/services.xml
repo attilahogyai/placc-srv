@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security-3.2.xsd
+        ">
+
+   	<!-- MyBatis config -->
+	
+<!-- 	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> -->
+<!--         <property name="jndiName" value="java:/comp/env/jdbc/qumlaDB"/> -->
+<!--     </bean> -->
+	
+	<bean id="vendorProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+	    <property name="properties">
+	        <props>
+	            <prop key="SQL Server">sqlserver</prop>
+	            <prop key="Oracle">oracle</prop>
+	                                                                                                                                                                                                                                            </props>
+	    </property>
+	</bean>
+	
+	<bean id="databaseIdProvider" class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
+	    <property name="properties" ref="vendorProperties"/>
+	</bean>
+
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	  <property name="dataSource" ref="myPlaccDS" />
+	  <property name="databaseIdProvider" ref="databaseIdProvider"></property>
+	  <property name="configLocation" value="classpath:mybatis-config.xml" />
+	  <property name="transactionFactory">
+	  	<bean class="org.apache.ibatis.transaction.managed.ManagedTransactionFactory" />
+	  </property> 
+	  <property name="typeHandlersPackage" value="com.myplacc.mybatis.typehandler" />
+	</bean>
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+	  <property name="basePackage" value="com.myplacc.service.impl" />
+	</bean>
+ 
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="myPlaccDS" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>     
+    
+    
+	<bean id="userManager" class="com.myplacc.service.impl.UserManager"
+		autowire="byName">
+		<property name="oAuthServiceMap">
+			<map>
+				<entry key="google" value-ref="googleOAuthService"></entry>
+				<entry key="facebook" value-ref="facebookOAuthService"></entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="googleOAuthService" class="com.myplacc.service.oauth.GoolgeOAuthServices"></bean>
+  	<bean id="facebookOAuthService" class="com.myplacc.service.oauth.FacebookOAuthService"></bean>
+    
+    
+</beans>

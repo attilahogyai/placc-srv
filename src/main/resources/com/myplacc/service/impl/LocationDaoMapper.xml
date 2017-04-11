@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace="com.myplacc.service.impl.LocationDaoMapper">
+
+	<cache eviction="LRU" flushInterval="60000" size="512" readOnly="true" />
+
+
+	<resultMap id="locationResult" type="Location" autoMapping="true">
+		<id property="id" column="id" />
+	</resultMap>
+
+	<sql id="selectLocation">
+		SELECT * from location
+	</sql>
+
+	<select id="findOne" resultMap="locationResult">
+		<include refid="selectLocation"></include>
+		where id=#{id}
+	</select>
+	<select id="findByCity" resultMap="locationResult">
+		<include refid="selectLocation"></include>
+		where country_code=#{country} and lower(city_name)=lower(#{city}) order by id limit 1
+	</select>
+	
+	
+	
+	
+	<insert id="insertLocation" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Location">
+		INSERT INTO location (
+		country_code,
+		state_code,
+		city_name,
+		timezoneid,
+		zip_code,
+		lon,
+		lat
+		)
+		values (
+		#{countryCode},
+		#{stateCode},
+		#{cityName},
+		#{timezoneId},		
+		#{zipCode},
+		#{lon},
+		#{lat}
+		)
+	</insert>
+
+	<update id="updateLocation" keyProperty="id" keyColumn="id"
+		parameterType="Location">
+		update location set
+		lon=#{lon},
+		lat=#{lat}
+		where id=#{id}
+	</update>
+
+</mapper>

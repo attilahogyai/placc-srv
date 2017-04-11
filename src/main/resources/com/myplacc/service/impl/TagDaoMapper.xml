@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace="com.myplacc.service.impl.TagDaoMapper">
+
+	<cache eviction="LRU" flushInterval="60000" size="512" readOnly="true" />
+
+	<resultMap id="tagResult" type="Tag" autoMapping="true">
+	</resultMap>
+	<resultMap id="SearchResultMap" type="SearchResult" autoMapping="true">
+		<id property="id" column="id" />
+		<result property="type" column="type"/>
+		<result property="title" column="title"/>
+	</resultMap>
+	
+	<sql id="tagSql">
+		select * from tag
+	</sql>
+	
+	<sql id="internationalFilter">
+		<if test="international">
+		language='english' or country=#{countryCode} 
+		</if>
+		<if test="!international">
+		country=#{countryCode}
+		</if>	
+		<if test="filterLanguage">
+		or language=#{filterLanguage}
+		</if>	
+	</sql>	
+	<select id="findOne" resultMap="tagResult">
+		<include refid="tagSql"></include>
+		where tag.id=#{id}
+	</select>
+	<insert id="insertTag" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Tag">
+		INSERT INTO tag (
+		tag,
+		type,
+		count,
+		country,
+		language
+		)
+		values (
+		#{tag},
+		#{type},
+		#{count},
+		#{country},
+		#{language}
+		)
+	</insert>
+	<select id="queryTags" resultMap="tagResult">
+		<bind name="pattern" value="_parameter.getQuery() + '%'" />
+		<include refid="tagSql"></include>
+		where count>0 and tag like #{pattern} order by count desc
+	</select>
+	<select id="freeTextQueryTag" resultMap="SearchResultMap">
+		<bind name="pattern" value="_parameter.getQuery() + '%'" />
+		select id, tag as title, 't' as type from tag
+		where count>0 and tag like #{pattern} order by count desc
+	</select>
+	
+	<select id="queryTagsCount" resultType="long">
+		<bind name="pattern" value="_parameter.getQuery() + '%'" />
+		select count(1) from tag
+		where count>0 and tag like #{pattern} order by count desc
+	</select>
+	<select id="getPopularTags" resultMap="tagResult">
+		<include refid="tagSql"></include>
+		where count>0 and (<include refid="internationalFilter"/>)
+		order by count desc limit 10
+	</select>
+	<select id="getPopularTagsCount" resultType="long">
+		select 10
+	</select>
+	
+	
+	
+	<update id="incrementTag">
+		update tag set count=count+1 where tag=#{tag} and country=#{country}
+	</update>
+	<update id="decrementTag">
+		update tag set count=count-1 where tag=#{tag} and country=#{country} 
+	</update>	
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+	 
+
+<mapper namespace="com.myplacc.service.impl.LangtextDaoMapper">
+	
+	<cache
+	  eviction="LRU"
+	  flushInterval="60000"
+	  size="512"
+	  readOnly="true"/>	
+	 
+
+	<select id="findAll" parameterType="LangtextRq" resultType="Langtext">
+		 SELECT * FROM langtext where server is null or server!=1
+	</select>
+	<select id="findOne" resultType="Langtext">
+		SELECT * FROM langtext where id=#{id}
+	</select>
+	
+	<select id="getText" resultType="java.lang.String">
+		SELECT text FROM langtext where type=#{type} and code=#{code} and language=lower(#{lang})
+	</select>
+	<select id="getCount" resultType="long">
+		SELECT count(*) FROM langtext 
+	</select>
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Langtext">
+		INSERT INTO langtext (
+		type,
+		code,
+		language,
+		text
+		)
+		values (
+		#{type},
+		#{code},
+		#{language},
+		#{text}	
+		)
+	</insert>
+
+
+
+	<update id="update" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Langtext">
+		update langtext 
+		set type=#{type},
+			code=#{code},
+			language=#{language},
+			text=#{text}
+		where 
+		id=#{id}
+	</update>
+		
+	<delete id="delete" parameterType="long">
+	delete from langtext where id=#{id}
+	</delete>	
+</mapper>

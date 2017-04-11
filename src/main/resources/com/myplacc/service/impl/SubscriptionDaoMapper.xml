@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace="com.myplacc.service.impl.SubscriptionDaoMapper">
+
+	<cache eviction="LRU" flushInterval="60000" size="512" readOnly="true" />
+
+
+	<resultMap id="subscriptionResult" type="Subscription" autoMapping="true">
+		<id property="id" column="id" />
+	</resultMap>
+
+	<sql id="subsSql">
+		SELECT * from subscription
+	</sql>
+
+	<select id="findOne" resultMap="subscriptionResult">
+		<include refid="subsSql"></include>
+		where id=#{id}
+	</select>
+
+	<select id="findAll" resultMap="subscriptionResult">
+		<include refid="subsSql"></include>
+
+	</select>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Subscription">
+		INSERT INTO subscription (
+			session,
+			email,
+			useracc,
+			question,
+			category,
+			last_change_dt,
+			last_notification_sent_dt,
+			create_dt
+		)
+		values (
+		#{session.code},
+		#{email},
+		#{useracc},
+		#{question},
+		#{category},
+		#{lastChangeDt},
+		#{lastNotificationSentDt},	
+		now()
+		)
+	</insert>
+
+	<update id="update" keyProperty="id" keyColumn="id"
+		parameterType="Subscription">
+		update subscription set
+			session=#{session.code},
+			email=#{email},
+			useracc=#{useracc},
+			question=#{question},
+			category=#{category},
+			last_change_dt=#{lastChangeDt},
+			last_notification_sent_dt=#{lastNotificationSentDt}
+		where id=#{id}
+	</update>
+
+</mapper>

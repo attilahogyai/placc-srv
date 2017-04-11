@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace="com.myplacc.service.impl.ImageDaoMapper">
+
+	<cache eviction="LRU" flushInterval="60000" size="512" readOnly="true" />
+
+
+	<resultMap id="imageResult" type="Image" autoMapping="true">
+		<id property="id" column="id" />
+	</resultMap>
+
+	<sql id="imageSql">
+		SELECT * from image
+	</sql>
+
+	<select id="findOne" resultMap="imageResult">
+		<include refid="imageSql"></include>
+		where id=#{id}
+	</select>
+
+	<select id="findByPath" resultMap="imageResult">
+		<include refid="imageSql"></include>
+		where path=#{path}
+	</select>	
+	<select id="findAll" resultMap="imageResult">
+		<include refid="imageSql"></include>
+		 where type=1 and status=1
+	</select>
+	<select id="findForQuery" resultMap="imageResult">
+		<include refid="imageSql"></include>
+		where type=1 and status=1
+		and
+	    textsearchable_index_col @@ 	to_tsquery('english'::regconfig, #{query})
+	</select>
+	<select id="findDefault" resultMap="imageResult">
+		<include refid="imageSql"></include>
+		where type=1 and status=1 and (tag is null or tag = '' or tag = 'background')
+	</select>
+	
+	
+	
+	<insert id="insertImage" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Image">
+		INSERT INTO image (
+		path,
+		title,
+		status,
+		dominant,
+		type,
+		tag,
+		textsearchable_index_col,
+		width,
+		height,
+		create_dt
+		)
+		values (
+		#{path},
+		#{title},
+		#{status},
+		#{dominant},
+		#{type},
+		#{tag},
+		to_tsvector('english'::regconfig, coalesce(#{tag},'')),
+		#{width},
+		#{height},	
+		now()
+		)
+	</insert>
+
+	<update id="updateImage" keyProperty="id" keyColumn="id">
+		update image set
+		title=#{title},
+		path=#{path},
+		status=#{status},
+		dominant=#{dominant},
+		type=#{type},
+		tag=#{tag},
+		width=#{width},
+		height=#{height},	
+		textsearchable_index_col=to_tsvector('english'::regconfig, coalesce(#{tag},''))
+		where id=#{id}
+	</update>
+
+</mapper>
