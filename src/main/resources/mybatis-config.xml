@@ -53,6 +53,7 @@
 		<typeAlias alias="Building" type="com.myplacc.domain.company.Building" />
 		<typeAlias alias="Level" type="com.myplacc.domain.company.Level" />
 		<typeAlias alias="Seat" type="com.myplacc.domain.company.Seat" />
+		<typeAlias alias="Reservation" type="com.myplacc.domain.reservation.Reservation" />
 		
 		
 			

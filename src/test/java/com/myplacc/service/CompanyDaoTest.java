@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.myplacc.domain.company.Building;
 import com.myplacc.domain.company.Company;
 import com.myplacc.domain.company.Level;
+import com.myplacc.domain.reservation.Reservation;
 import com.myplacc.service.impl.PlaccDaoMapper;
 
 public class CompanyDaoTest extends AbstractTest {
@@ -55,8 +56,11 @@ public class CompanyDaoTest extends AbstractTest {
 		assertNotNull(l.getSeat().get(0).getName());
 		assertNotNull(l.getStatus());
 		
-		
-		
 	}
-
+	@Test
+	public void testReservation(){
+		PlaccDaoMapper mapper=(PlaccDaoMapper)getMapper(PlaccDaoMapper.class);
+		List<Reservation> reserv=mapper.listReservationsForLevel(4L);
+		assertNotNull(reserv);
+	}
 }

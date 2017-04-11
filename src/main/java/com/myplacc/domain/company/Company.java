@@ -1,5 +1,6 @@
 package com.myplacc.domain.company;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.myplacc.domain.AbstractEntity;
@@ -15,6 +16,9 @@ public class Company extends AbstractEntity {
 	@JsonApiIncludeByDefault
 	@JsonApiToMany
 	private List<Building> building;
+
+	private Timestamp createdt;
+	
 	public List<Building> getBuilding() {
 		return building;
 	}
@@ -32,6 +36,12 @@ public class Company extends AbstractEntity {
 	}
 	public void setImg(String img) {
 		this.img = img;
+	}
+	public Timestamp getCreatedt() {
+		return createdt;
+	}
+	public void setCreatedt(Timestamp createdt) {
+		this.createdt = createdt;
 	}
 	
 	
