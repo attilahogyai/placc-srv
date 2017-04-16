@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -12,7 +14,9 @@ import org.junit.Test;
 import com.myplacc.domain.company.Building;
 import com.myplacc.domain.company.Company;
 import com.myplacc.domain.company.Level;
+import com.myplacc.domain.company.Seat;
 import com.myplacc.domain.reservation.Reservation;
+import com.myplacc.domain.user.Useracc;
 import com.myplacc.service.impl.PlaccDaoMapper;
 
 public class CompanyDaoTest extends AbstractTest {
@@ -60,7 +64,15 @@ public class CompanyDaoTest extends AbstractTest {
 	@Test
 	public void testReservation(){
 		PlaccDaoMapper mapper=(PlaccDaoMapper)getMapper(PlaccDaoMapper.class);
+		Reservation r=new Reservation();
+		r.setSeat(new Seat(1L));
+		r.setUseracc(new Useracc(32L));
+		r.setStatus(1);
+		r.setCreateDt(new Timestamp((new Date()).getTime()));
+		r.setTargetDate(new Date());
+		mapper.prepareReservation(r);
 		List<Reservation> reserv=mapper.listReservationsForLevel(4L);
 		assertNotNull(reserv);
+		assertNotNull(reserv.get(0));
 	}
 }

@@ -380,7 +380,8 @@ public class LoginController extends AbstractController{
 		Useracc ua = new Useracc();
 		ua.setEmail(email.toLowerCase());
 		ua.setName(name);
-		ua.setStatus(0);
+		//ua.setStatus(0);
+		ua.setStatus(1);
 		ua.setScopes(REGISTERED_SCOPES);
 		String ep=userDaoMapper.encodePassword(password);
 		log.debug("password:"+ep);
@@ -390,7 +391,7 @@ public class LoginController extends AbstractController{
 				+ Long.toString(RandomHelper.getRandomLong(1000000)));
 		
 		userManager.newUserInit(ua);
-		
+		/*
 		try {
 			Map arguments = new HashMap();
 			arguments.put("addressee", ua);
@@ -407,8 +408,9 @@ public class LoginController extends AbstractController{
 				userDaoMapper.delete(user);
 			}
 			log.error("send mail error:", e);
-			throw new RuntimeException (e);
+			throw e;
 		}
+		*/
 		ua.setSensible(true);
 		
 		Session session=RequestWrapper.getSession();

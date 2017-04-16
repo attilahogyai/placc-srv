@@ -52,12 +52,37 @@
 		</collection>
 	</resultMap>
 	
+	
+	<sql id="reservationSql">
+	select r.id as rid,
+		r.seat as rseat,
+		r.useracc as ruseracc,
+		r.create_dt as rcreate_dt,
+		s.name as sname,
+		s.id as sid,
+		l.name as lname,
+		l.id as lid
+	 from reservation r, seat s, level l
+	 where r.seat=s.id and s.level=l.id
+	</sql>	
 	<resultMap id="ReservationResult" type="Reservation" autoMapping="true">
 		<result column="rid" property="id" />
-		<result column="rseat" property="seat" />
 		<result column="rcreate_dt" property="createDt" />
-		<result column="ruseracc" property="useracc" />
-	</resultMap>
+		<association column="ruseracc" property="useracc" javaType="Useracc">
+			<id property="id" column="ruseracc"/>
+		</association>	
+		<association column="sid" property="seat" javaType="Seat">
+			<id property="id" column="sid"/>
+			<result property="name" column="sname"/>
+			<association column="lid" property="level" javaType="Level">
+				<id property="id" column="lid"/>
+				<result property="name" column="lname"/>
+			</association>			
+		</association>		
+
+	</resultMap>	
+	
+	
 
 	<sql id="companySql">
 	select c.id as cid,
@@ -106,15 +131,7 @@
 	 join building as b on l.building=b.id
 	 where l.status=1
 	</sql>	
-	<sql id="reservationSql">
-	select r.id as rid,
-		r.seat as rseat,
-		r.useracc as ruseracc,
-		r.create_dt as rcreate_dt,
-		b.address as baddress
-	 from reservation as r 
-	 where 1=1
-	</sql>	
+
 	
 	<select id="findOneCompany" resultMap="companyResult">
 		<include refid="companySql"></include>
@@ -143,10 +160,15 @@
 	<select id="listReservationsForLevel" resultMap="ReservationResult">
 		<include refid="reservationSql"></include>
 		<![CDATA[
-		and r.level=#{lid}
+		and s.level=#{lid}
 		]]>
 	</select>
-
+	<select id="listReservationsForSeat" resultMap="ReservationResult">
+		<include refid="reservationSql"></include>
+		<![CDATA[
+		and s.id=#{sid}
+		]]>
+	</select>
 	
 	<insert id="insertCompany" useGeneratedKeys="true" keyProperty="id"
 		keyColumn="id" parameterType="Company">
@@ -177,6 +199,25 @@
 		where 
 		id=#{id}
 	</update>
-	
-
+	<insert id="prepareReservation" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Reservation">
+		INSERT INTO reservation (
+		seat,
+		useracc,
+		status,
+		create_dt
+		)
+		values (
+		#{seat.id},
+		#{useracc.id},
+		1,
+		#{createDt}
+		)
+	</insert>	
+	<update id="finishReservation" useGeneratedKeys="true" keyProperty="id"
+		keyColumn="id" parameterType="Reservation">
+		update reservation set status=2,
+		create_dt = #{createDt},
+		where seat= #{seat.id} and useracc = #{useracc.id} 
+	</update>	
 </mapper>

@@ -12,6 +12,12 @@ public class Seat extends AbstractEntity {
 	private Integer capacity;
 	private String name;
 	private String img;
+	public Seat(){
+		
+	}
+	public Seat(Long id){
+		this.id = id;
+	}	
 	public Level getLevel() {
 		return level;
 	}

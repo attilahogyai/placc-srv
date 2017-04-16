@@ -14,4 +14,9 @@ public interface PlaccDaoMapper {
 	public Level findOneLevel(Long id);
 	
 	public List<Reservation> listReservationsForLevel(Long level);
+	public List<Reservation> listReservationsForSeat(Long seat);
+	
+	public void prepareReservation(Reservation reservation);
+	public void finishReservation(Reservation reservation);
+	
 }
