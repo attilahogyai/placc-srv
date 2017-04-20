@@ -4,6 +4,7 @@ package com.myplacc.domain.reservation;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.myplacc.domain.AbstractEntity;
 import com.myplacc.domain.company.Seat;
 import com.myplacc.domain.user.Useracc;
@@ -17,18 +18,15 @@ public class Reservation extends AbstractEntity {
 	@JsonApiIncludeByDefault
 	@JsonApiToOne
 	private Seat seat;	
-	@JsonApiIncludeByDefault
-	@JsonApiToOne
 	private Integer status;
-	
-	private Date targetDate;
+	private Timestamp targetDate;
 	
 	private Timestamp createDt;
 	
-	
-	
+	@JsonApiToOne
 	private Useracc useracc;
-
+	private Long userId;
+	
 	public Useracc getUseracc() {
 		return useracc;
 	}
@@ -61,11 +59,19 @@ public class Reservation extends AbstractEntity {
 		this.createDt = createDt;
 	}
 
-	public Date getTargetDate() {
+	public Timestamp getTargetDate() {
 		return targetDate;
 	}
 
-	public void setTargetDate(Date targetDate) {
+	public void setTargetDate(Timestamp targetDate) {
 		this.targetDate = targetDate;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 }

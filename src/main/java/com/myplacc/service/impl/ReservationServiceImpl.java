@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.myplacc.domain.reservation.Reservation;
+import com.myplacc.domain.user.Session;
+import com.myplacc.web.controller.RequestWrapper;
+import com.myplacc.web.exception.AuthException;
+import com.myplacc.web.exception.PermissionDenied;
 
 import io.katharsis.queryParams.QueryParams;
 import io.katharsis.repository.ResourceRepository;
@@ -17,8 +21,19 @@ public class ReservationServiceImpl extends AbstractService implements  Resource
 	
 	@Override
 	public void delete(Long arg0) {
-		// TODO Auto-generated method stub
-		
+		Session session=RequestWrapper.getSession();
+		if(session.isRegistered()){
+			Reservation r=placcDaoMapper.findOneReservation(arg0);
+			Long id=session.getUseracc().getId();
+			if(!id.equals(r.getUseracc().getId())){
+				throw new PermissionDenied("BELONGS TO OTHER USER");
+			}
+			
+			placcDaoMapper.deleteReservation(arg0);
+		}else{
+			throw new AuthException("NOT AUTHORIZED");
+		}
+			
 	}
 
 	@Override
@@ -30,14 +45,13 @@ public class ReservationServiceImpl extends AbstractService implements  Resource
 
 	@Override
 	public Iterable<Reservation> findAll(Iterable<Long> arg0, QueryParams arg1) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public Reservation findOne(Long arg0, QueryParams arg1) {
-		// TODO Auto-generated method stub
-		return null;
+		return placcDaoMapper.findOneReservation(arg0);
 	}
 
 	@Override

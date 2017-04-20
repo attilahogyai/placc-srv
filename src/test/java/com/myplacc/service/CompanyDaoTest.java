@@ -69,10 +69,13 @@ public class CompanyDaoTest extends AbstractTest {
 		r.setUseracc(new Useracc(32L));
 		r.setStatus(1);
 		r.setCreateDt(new Timestamp((new Date()).getTime()));
-		r.setTargetDate(new Date());
+		r.setTargetDate(new Timestamp((new Date()).getTime()));
 		mapper.prepareReservation(r);
 		List<Reservation> reserv=mapper.listReservationsForLevel(4L);
 		assertNotNull(reserv);
 		assertNotNull(reserv.get(0));
+		Reservation re=mapper.findOneReservation(reserv.get(0).getId());
+		assertEquals(reserv.get(0).getId(),re.getId());
+		assertNotNull(re.getTargetDate());
 	}
 }

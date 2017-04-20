@@ -18,5 +18,7 @@ public interface PlaccDaoMapper {
 	
 	public void prepareReservation(Reservation reservation);
 	public void finishReservation(Reservation reservation);
+	public Reservation findOneReservation(Long id);
+	public void deleteReservation(Long id);
 	
 }

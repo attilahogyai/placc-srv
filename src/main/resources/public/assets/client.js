@@ -130,8 +130,9 @@ define('client/app', ['exports', 'ember', 'client/resolver', 'ember-load-initial
 	_ember['default'].onerror = function (error) {
 		var status = error.errors && error.errors[0].status || error.status;
 		var errors = error.errors && error.errors[0].code || 'general';
-
-		if (status == '403') {
+		if (status == '400') {
+			_ember['default'].Logger.info("bad request json:" + error.statusText);
+		} else if (status == '403') {
 			Materialize.toast('<span style="font-size:1.2em;white-space:nowrap;max-width:800px;">Sorry, accessing this content is denined! Please sign in to access this content!<span>', 10000, "", function () {/*window.xappc.reload();*/});
 			_ember['default'].Logger.error("error:" + status + ":" + error.statusText);
 		} else if (status == '417') {
@@ -203,6 +204,9 @@ define('client/app', ['exports', 'ember', 'client/resolver', 'ember-load-initial
 				success: success,
 				error: error
 			});
+		},
+		mapOnData: function mapOnData(data) {
+			console.log(data);
 		},
 		session: null,
 		appInstane: null,
@@ -533,12 +537,69 @@ define('client/helpers/app-version', ['exports', 'ember', 'client/config/environ
 
   exports['default'] = _ember['default'].Helper.helper(appVersion);
 });
+define('client/helpers/date-format', ['exports', 'ember'], function (exports, _ember) {
+	exports.dateFormat = dateFormat;
+
+	function dateFormat(params /*, hash*/) {
+		var date = params[0];
+		var format = params[1];
+
+		if (typeof date === 'string') {
+			date = moment(date);
+		}
+		if (format === 'fromNow') {
+			return date.fromNow();
+		}
+		if (date && date.format) {
+			return date.format(format);
+		}
+		return '';
+	}
+
+	exports['default'] = _ember['default'].Helper.helper(dateFormat);
+});
+define('client/helpers/eq-o', ['exports', 'ember'], function (exports, _ember) {
+	exports.eq = eq;
+
+	function eq(params) {
+		return params[0] === params[1];
+	}
+
+	exports['default'] = _ember['default'].Helper.helper(eq);
+});
+define('client/helpers/find-reservation', ['exports', 'ember'], function (exports, _ember) {
+	exports.findReservation = findReservation;
+
+	function findReservation(params /*, hash*/) {
+		var reservation = params[0].get('content');
+		var day = params[1];
+		for (var i = 0; i < reservation.length; i++) {
+			var same = reservation[i].record.get('targetDate').isSame(day);
+
+			if (same) {
+				return reservation[i];
+			}
+		}
+		return 0;
+	}
+
+	exports['default'] = _ember['default'].Helper.helper(findReservation);
+});
 define('client/helpers/gt-num', ['exports', 'ember'], function (exports, _ember) {
 
 	function gt(params) {
 		return params[0] > params[1];
 	}
 	exports['default'] = _ember['default'].Helper.helper(gt);
+});
+define('client/helpers/is-today', ['exports', 'ember'], function (exports, _ember) {
+  exports.isToday = isToday;
+
+  function isToday(params /*, hash*/) {
+    return params;
+  }
+
+  exports['default'] = _ember['default'].Helper.helper(isToday);
 });
 define('client/helpers/not-b', ['exports', 'ember'], function (exports, _ember) {
 
@@ -619,6 +680,47 @@ define('client/initializers/app-version', ['exports', 'ember-cli-app-version/ini
   exports['default'] = {
     name: 'App Version',
     initialize: (0, _emberCliAppVersionInitializerFactory['default'])(name, version)
+  };
+});
+define('client/initializers/component-styles', ['exports', 'ember', 'ember-component-css/pod-names', 'client/mixins/style-namespacing-extras'], function (exports, _ember, _emberComponentCssPodNames, _clientMixinsStyleNamespacingExtras) {
+  exports.initialize = initialize;
+  var Component = _ember['default'].Component;
+  var ComponentLookup = _ember['default'].ComponentLookup;
+  var computed = _ember['default'].computed;
+  var getOwner = _ember['default'].getOwner;
+
+  ComponentLookup.reopen({
+    componentFor: function componentFor(name, owner) {
+      owner = owner.hasRegistration ? owner : getOwner(this);
+
+      if (_emberComponentCssPodNames['default'][name] && !owner.hasRegistration('component:' + name)) {
+        owner.register('component:' + name, Component);
+      }
+      return this._super.apply(this, arguments);
+    }
+  });
+
+  Component.reopen(_clientMixinsStyleNamespacingExtras['default'], {
+    componentCssClassName: computed({
+      get: function get() {
+        return _emberComponentCssPodNames['default'][this.get('_componentIdentifier')] || '';
+      }
+    }),
+
+    init: function init() {
+      this._super.apply(this, arguments);
+
+      if (this.get('_shouldAddNamespacedClassName')) {
+        this.classNames = this.classNames.concat(this.get('componentCssClassName'));
+      }
+    }
+  });
+
+  function initialize() {}
+
+  exports['default'] = {
+    name: 'component-styles',
+    initialize: initialize
   };
 });
 define('client/initializers/container-debug-adapter', ['exports', 'ember-resolver/container-debug-adapter'], function (exports, _emberResolverContainerDebugAdapter) {
@@ -889,6 +991,7 @@ define('client/instance-initializers/language', ['exports', 'ember'], function (
         var i18n = appInstance.lookup('service:i18n');
         var modal = appInstance.lookup('service:modal');
         window.xappc.i18n = i18n;
+        window.xappc.appInstance = appInstance;
 
         //appInstance.deferReadiness();
         _ember['default'].$.ajaxSetup({
@@ -1128,6 +1231,14 @@ define('client/mirage/scenarios/default', ['exports'], function (exports) {
 define('client/mirage/serializers/application', ['exports', 'ember-cli-mirage'], function (exports, _emberCliMirage) {
   exports['default'] = _emberCliMirage.JSONAPISerializer.extend({});
 });
+define('client/mixins/style-namespacing-extras', ['exports', 'ember-component-css/mixins/style-namespacing-extras'], function (exports, _emberComponentCssMixinsStyleNamespacingExtras) {
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function get() {
+      return _emberComponentCssMixinsStyleNamespacingExtras['default'];
+    }
+  });
+});
 define('client/models/building', ['exports', 'ember-data'], function (exports, _emberData) {
 	exports['default'] = _emberData['default'].Model.extend({
 		name: _emberData['default'].attr('string'),
@@ -1186,8 +1297,11 @@ define('client/models/level', ['exports', 'ember-data'], function (exports, _emb
 define('client/models/reservation', ['exports', 'ember-data'], function (exports, _emberData) {
 	exports['default'] = _emberData['default'].Model.extend({
 		seat: _emberData['default'].belongsTo('seat'),
-		user: _emberData['default'].attr('number'),
-		createDt: _emberData['default'].attr('date')
+		user: _emberData['default'].belongsTo('useracc'),
+		userId: _emberData['default'].attr('number'),
+		targetDate: _emberData['default'].attr('timestamp'),
+		createDt: _emberData['default'].attr('timestamp'),
+		status: _emberData['default'].attr('number')
 	});
 });
 define('client/models/seat', ['exports', 'ember-data'], function (exports, _emberData) {
@@ -1197,8 +1311,8 @@ define('client/models/seat', ['exports', 'ember-data'], function (exports, _embe
 		img_x: _emberData['default'].attr('number'),
 		img_y: _emberData['default'].attr('number'),
 		capacity: _emberData['default'].attr('number'),
-		createDt: _emberData['default'].attr('date')
-
+		createDt: _emberData['default'].attr('date'),
+		reservations: _emberData['default'].hasMany('reservation')
 	});
 });
 define('client/models/session', ['exports', 'ember', 'ember-data'], function (exports, _ember, _emberData) {
@@ -1260,6 +1374,45 @@ define('client/models/user', ['exports', 'ember', 'ember-data', 'client/app', 'e
   });
   _ember['default'].Inflector.inflector.uncountable('user');
   exports['default'] = User;
+});
+define('client/models/useracc', ['exports', 'ember', 'ember-data'], function (exports, _ember, _emberData) {
+	var User = _emberData['default'].Model.extend({
+		name: _emberData['default'].attr('string'),
+		email: _emberData['default'].attr('string'),
+		hash: _emberData['default'].attr('string'),
+		image: _emberData['default'].attr('boolean'),
+		imagec: _emberData['default'].attr('number'),
+		displayName: _ember['default'].computed('name', 'login', function () {
+			if (this.get('login')) {
+				return '@' + this.get('login');
+			} else {
+				return this.get('name');
+			}
+		})
+	});
+	_ember['default'].Inflector.inflector.uncountable('useracc');
+	exports['default'] = User;
+});
+define('client/pods/activate/controller', ['exports', 'ember'], function (exports, _ember) {
+  exports['default'] = _ember['default'].Controller.extend({
+    code: null,
+    activated: null
+  });
+});
+define('client/pods/activate/route', ['exports', 'ember'], function (exports, _ember) {
+	exports['default'] = _ember['default'].Route.extend({
+		setupController: function setupController(controller, model) {
+			var activate = window.xappc.getData('/api/activateuser/' + model.code + "/" + model.email, true, 'GET', true, false, {}, null, null);
+			activate.then(function () {
+				controller.set('activated', true);
+			}, function () {
+				controller.set('activated', false);
+			});
+		}
+	});
+});
+define("client/pods/activate/template", ["exports"], function (exports) {
+  exports["default"] = Ember.HTMLBars.template({ "id": "yylQ7OAu", "block": "{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"static-attr\",\"id\",\"index-banner\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"activated\"]]],null,2,0],[\"text\",\"\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\\n\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"\\t\\t\\t\"],[\"append\",[\"helper\",[\"t\"],[\"registration.activate_error\"],null],true],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"menu.signin\"],null],false]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\"],[\"append\",[\"helper\",[\"t\"],[\"registration.activate_success\"],null],true],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"br\",[]],[\"flush-element\"],[\"close-element\"],[\"open-element\",\"br\",[]],[\"flush-element\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"block\",[\"link-to\"],[\"profile.index\"],[[\"class\"],[\"btn waves-effect waves-light\"]],1],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/activate/template.hbs" } });
 });
 define("client/pods/admin/language/controller", ["exports", "client/app", "ember"], function (exports, _clientApp, _ember) {
 	var ObservableField = _ember["default"].Object.extend({
@@ -1553,6 +1706,86 @@ define("client/pods/components/info-modal/component", ["exports", "ember"], func
 define("client/pods/components/info-modal/template", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template({ "id": "Bir1kmGn", "block": "{\"statements\":[[\"text\",\" \"],[\"comment\",\" Modal Structure \"],[\"text\",\"\\n\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"id\",\"infoModal\"],[\"static-attr\",\"class\",\"modal\"],[\"flush-element\"],[\"text\",\"\\n  \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"modal-content\"],[\"flush-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"h4\",[]],[\"flush-element\"],[\"append\",[\"unknown\",[\"model\",\"header\"]],true],[\"close-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"append\",[\"unknown\",[\"model\",\"text\"]],true],[\"close-element\"],[\"text\",\"\\n  \"],[\"close-element\"],[\"text\",\"\\n  \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"modal-footer\"],[\"flush-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"a\",[]],[\"static-attr\",\"href\",\"#!\"],[\"static-attr\",\"class\",\" modal-action modal-close waves-effect waves-green btn-flat\"],[\"modifier\",[\"action\"],[[\"get\",[null]],\"close\"]],[\"flush-element\"],[\"text\",\"OK\"],[\"close-element\"],[\"text\",\"\\n  \"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/components/info-modal/template.hbs" } });
 });
+define('client/pods/components/placc-calendar/component', ['exports', 'ember'], function (exports, _ember) {
+
+    function findReservation(reservations, day) {
+        for (var i = 0; i < reservations.length; i++) {
+            var same = reservations[i].getRecord().get('targetDate').isSame(day);
+            if (same) {
+                return reservations[i];
+            }
+        }
+        return 0;
+    }
+
+    exports['default'] = _ember['default'].Component.extend({
+        options: {
+            dismissible: false, // Modal can be dismissed by clicking outside of the modal
+            opacity: 0.5, // Opacity of modal background
+            inDuration: 200, // Transition in duration
+            outDuration: 200, // Transition out duration
+            ready: null, // Callback for Modal open
+            complete: null },
+        // Callback for Modal close
+        startDay: null,
+        reservations: null,
+        ownerId: null,
+
+        items: _ember['default'].computed('startDay', 'reservations', function () {
+            var start = this.get('startDay');
+            var days = [];
+            for (var i = 0; i < 7; i++) {
+                var d = start.clone().add(i, 'days');
+                var r = findReservation(this.get('reservations.content'), d);
+                var owner = false;
+                if (r) {
+                    owner = parseInt(this.get('ownerId')) === r.getRecord().get('userId');
+                }
+                days.push({ date: d, reservation: r, owner: owner });
+            }
+            return days;
+        }),
+        init: function init() {
+            this._super.apply(this, arguments);
+            this.startDay = moment().startOf('isoWeek');
+        },
+        didInsertElement: function didInsertElement() {
+            var _this = this;
+
+            var self = this;
+            _ember['default'].run.scheduleOnce('afterRender', this, function () {
+                _this.$("#calendarModal").modal(self.get('options'));
+                _this.$("#calendarModal").modal('open');
+            });
+        },
+        willDestroyElement: function willDestroyElement() {
+            this.$("#calendarModal").modal('close');
+        },
+        actions: {
+            nextWeek: function nextWeek() {
+                var d = this.get('startDay').clone().add(7, 'days');
+                this.set('startDay', d);
+            },
+            prevWeek: function prevWeek() {
+                var d = this.get('startDay').clone().subtract(7, 'days');
+                this.set('startDay', d);
+            },
+            reserv: function reserv(day) {
+                this.get('onReserv')(day);
+            },
+            release: function release(reservation) {
+                this.get('onRelease')(reservation);
+            },
+            close: function close() {
+                this.get('onClose')();
+            }
+
+        }
+    });
+});
+define("client/pods/components/placc-calendar/template", ["exports"], function (exports) {
+  exports["default"] = Ember.HTMLBars.template({ "id": "VG6eLk/N", "block": "{\"statements\":[[\"text\",\" \"],[\"comment\",\" Modal Structure \"],[\"text\",\"\\n\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"id\",\"calendarModal\"],[\"static-attr\",\"class\",\"modal\"],[\"flush-element\"],[\"text\",\"\\n  \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"modal-content\"],[\"flush-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"h4\",[]],[\"flush-element\"],[\"text\",\"Reservation calendar\"],[\"close-element\"],[\"text\",\"\\n\"],[\"open-element\",\"div\",[]],[\"dynamic-attr\",\"class\",[\"concat\",[[\"unknown\",[\"componentCssClassName\"]],\"_calendar\"]]],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"each\"],[[\"get\",[\"items\"]]],null,4],[\"text\",\"\\t\"],[\"open-element\",\"div\",[]],[\"dynamic-attr\",\"class\",[\"concat\",[[\"unknown\",[\"componentCssClassName\"]],\"_prev\"]]],[\"modifier\",[\"action\"],[[\"get\",[null]],\"prevWeek\"]],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"i\",[]],[\"static-attr\",\"class\",\"material-icons\"],[\"flush-element\"],[\"text\",\"keyboard_arrow_left\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\t\\n\\t\"],[\"open-element\",\"div\",[]],[\"dynamic-attr\",\"class\",[\"concat\",[[\"unknown\",[\"componentCssClassName\"]],\"_next\"]]],[\"modifier\",[\"action\"],[[\"get\",[null]],\"nextWeek\"]],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"i\",[]],[\"static-attr\",\"class\",\"material-icons\"],[\"flush-element\"],[\"text\",\"keyboard_arrow_right\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\\n  \"],[\"close-element\"],[\"text\",\"\\n  \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"modal-footer\"],[\"flush-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"a\",[]],[\"static-attr\",\"href\",\"#!\"],[\"static-attr\",\"class\",\" modal-action modal-close waves-effect waves-green btn-flat\"],[\"modifier\",[\"action\"],[[\"get\",[null]],\"close\"]],[\"flush-element\"],[\"text\",\"OK\"],[\"close-element\"],[\"text\",\"\\n  \"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"\\t\"],[\"open-element\",\"a\",[]],[\"dynamic-attr\",\"class\",[\"concat\",[[\"unknown\",[\"componentCssClassName\"]],\"_status_reserved2\"]]],[\"flush-element\"],[\"text\",\"RESERVED\"],[\"close-element\"],[\"text\",\"\\t\\n\\t\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\"],[\"comment\",\"a class=\\\"{{!componentCssClassName}}_status_reserved1\\\" {{!action 'release' element.reservation.id}}>PREPARED</a\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"a\",[]],[\"dynamic-attr\",\"class\",[\"concat\",[[\"unknown\",[\"componentCssClassName\"]],\"_status_reserved2_my\"]]],[\"modifier\",[\"action\"],[[\"get\",[null]],\"release\",[\"get\",[\"element\",\"reservation\"]]]],[\"flush-element\"],[\"text\",\"RELEASE\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"block\",[\"if\"],[[\"get\",[\"element\",\"owner\"]]],null,1,0]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\"],[\"open-element\",\"a\",[]],[\"dynamic-attr\",\"class\",[\"concat\",[[\"unknown\",[\"componentCssClassName\"]],\"_status_free\"]]],[\"modifier\",[\"action\"],[[\"get\",[null]],\"reserv\",[\"get\",[\"element\",\"date\"]]]],[\"flush-element\"],[\"text\",\"RESERV\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\"],[\"open-element\",\"div\",[]],[\"dynamic-attr\",\"class\",[\"concat\",[[\"unknown\",[\"componentCssClassName\"]],\"_day_\",[\"helper\",[\"date-format\"],[[\"get\",[\"element\",\"date\"]],\"e\"],null]]]],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"p\",[]],[\"dynamic-attr\",\"class\",[\"concat\",[[\"unknown\",[\"componentCssClassName\"]],\"_month\"]]],[\"flush-element\"],[\"append\",[\"helper\",[\"date-format\"],[[\"get\",[\"element\",\"date\"]],\"MMMM\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"p\",[]],[\"dynamic-attr\",\"class\",[\"concat\",[[\"unknown\",[\"componentCssClassName\"]],\"_date\"]]],[\"flush-element\"],[\"append\",[\"helper\",[\"date-format\"],[[\"get\",[\"element\",\"date\"]],\"D\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"p\",[]],[\"dynamic-attr\",\"class\",[\"concat\",[[\"unknown\",[\"componentCssClassName\"]],\"_week\"]]],[\"flush-element\"],[\"append\",[\"helper\",[\"date-format\"],[[\"get\",[\"element\",\"date\"]],\"ddd\"],null],false],[\"close-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"helper\",[\"eq-o\"],[[\"get\",[\"element\",\"reservation\"]],0],null]],null,3,2],[\"text\",\"\\t\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[\"element\"]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/components/placc-calendar/template.hbs" } });
+});
 define('client/pods/components/post-question/component', ['exports', 'ember'], function (exports, _ember) {
 	exports['default'] = _ember['default'].Component.extend({
 		tagName: ''
@@ -1694,7 +1927,7 @@ define("client/pods/cpolicy/template", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template({ "id": "CFULTmGm", "block": "{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"open-element\",\"h4\",[]],[\"flush-element\"],[\"text\",\"Cookies\"],[\"close-element\"],[\"text\",\"\\n\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"text\",\"\\nTo make this site work properly, we sometimes place small data files called cookies on your device. Most big websites do this too.\\n\"],[\"close-element\"],[\"text\",\"\\n\"],[\"open-element\",\"h5\",[]],[\"flush-element\"],[\"text\",\"\\nWhat are cookies?\\n\"],[\"close-element\"],[\"text\",\"\\n\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"text\",\"\\nA cookie is a small text file that a website saves on your computer or mobile device when you visit the site. It enables the website to remember your actions and preferences (such as login browsing session, language and other display preferences) over a period of time, so you don’t have to keep re-entering them whenever you come back to the site or browse from one page to another.\\n\"],[\"close-element\"],[\"text\",\"\\n\"],[\"open-element\",\"h5\",[]],[\"flush-element\"],[\"text\",\"\\nHow do we use cookies?\\n\"],[\"close-element\"],[\"text\",\"\\n\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"text\",\"\\nWhen you first come to myplacc.hu we store a small identification code in you browser. This code will identify your browser (not person) and you will know what question you have already answered what are new for you. This cookie is helps us to provide you a better experience when you visit qumla.com. We are not able to provide give you a full user exprience without cookies.\\n\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/cpolicy/template.hbs" } });
 });
 define('client/pods/index/controller', ['exports', 'ember'], function (exports, _ember) {
-  exports['default'] = _ember['default'].Controller.extend({});
+	exports['default'] = _ember['default'].Controller.extend({});
 });
 define('client/pods/index/route', ['exports', 'ember', 'client/utils/q-infinity-route', 'client/config/environment'], function (exports, _ember, _clientUtilsQInfinityRoute, _clientConfigEnvironment) {
 	exports['default'] = _clientUtilsQInfinityRoute['default'].extend({
@@ -1715,15 +1948,100 @@ define('client/pods/index/route', ['exports', 'ember', 'client/utils/q-infinity-
 define("client/pods/index/template", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template({ "id": "1Y6oYFP2", "block": "{\"statements\":[[\"block\",[\"page-view\"],null,[[\"scrollToTop\"],[true]],0]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"static-attr\",\"id\",\"index-banner\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m7\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"append\",[\"helper\",[\"company-list\"],null,[[\"companyList\",\"infinityLoad\"],[[\"get\",[\"model\"]],\"infinityLoad\"]]],false],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m5\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"toc-wrapper\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"append\",[\"unknown\",[\"post-question\"]],false],[\"text\",\"\\t\\t\\t\\t\\n\"],[\"text\",\"\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/index/template.hbs" } });
 });
+define('client/pods/level/controller', ['exports', 'ember'], function (exports, _ember) {
+	exports['default'] = _ember['default'].Controller.extend({
+		seatId: null,
+		modal: _ember['default'].inject.service(),
+		i18n: _ember['default'].inject.service(),
+		session: _ember['default'].inject.service(),
+		userId: _ember['default'].computed.readOnly('session.userid'),
+		isLoggedIn: _ember['default'].computed.readOnly('session.isLoggedIn'),
+		reservations: null,
+		calendarOpen: false,
+
+		actions: {
+			setReservation: function setReservation(seatId) {
+				var _this = this;
+
+				if (!this.get('isLoggedIn')) {
+					this.get('modal').openInfoModal({ header: this.get('i18n').t('login.login_required'), text: this.get('i18n').t('login.login_required_for_reservation') });
+				} else {
+					this.get('store').query('reservation', { filters: { seat: seatId } }).then(function (data) {
+						_this.set('seatId', seatId);
+						_this.set('reservations', data);
+						_this.set('calendarOpen', true);
+					});
+					// call reservation update
+				}
+			},
+			onRelease: function onRelease(reservation) {
+				var _this2 = this;
+
+				reservation.deleteRecord();
+				var s = reservation.save();
+				this.get('loader').startLoadProcess(s);
+				var c = this;
+				s.then(function () {
+					_this2.get('store').query('reservation', { filters: { seat: _this2.get('seatId') } }).then(function (data) {
+						_this2.set('reservations', data);
+					})['catch'](function () {});
+				})['catch'](function (status) {
+					c.get('modal').openInfoModal({ header: c.get('i18n').t('reservation.error-header'), text: c.get('i18n').t('reservation.error-delete.' + status.responseText, status.text) });
+				});
+			},
+			onReserve: function onReserve(day) {
+				var _this3 = this;
+
+				var sid = this.get('seatId');
+				var ds = day.format('YYYY-MM-DD HH:mm:ss.SSSZZ');
+				_ember['default'].Logger.info('set reservation for sid:' + sid);
+				var reserv = window.xappc.getData('/api/prepareReservation', true, 'POST', true, false, {
+					sid: sid,
+					date: ds
+				}, null, null);
+				this.get('loader').startLoadProcess(reserv);
+				var c = this;
+				reserv.then(function (reservation) {
+					_this3.get('store').query('reservation', { filters: { seat: _this3.get('seatId') } }).then(function (data) {
+						_this3.set('reservations', data);
+						window.xappc.mapOnData(data);
+					})['catch'](function () {});
+				}, function (status) {
+					_this3.set('calendarOpen', false);
+					if (status.responseText) {
+						c.get('modal').openInfoModal({ header: c.get('i18n').t('reservation.error-header'), text: c.get('i18n').t('reservation.error-text.' + status.responseText, status.text) });
+					} else {
+						c.get('modal').openInfoModal({ header: c.get('i18n').t('reservation.error-header'), text: c.get('i18n').t('reservation.error-text', status.text) });
+					}
+				});
+			},
+			onCloseCalendar: function onCloseCalendar() {
+				this.set('calendarOpen', false);
+			}
+		}
+	});
+});
 define('client/pods/level/route', ['exports', 'ember'], function (exports, _ember) {
 	exports['default'] = _ember['default'].Route.extend({
+
+		i18n: _ember['default'].inject.service(),
 		model: function model(params) {
 			return this.get('store').findRecord('level', params.level_id);
+		},
+		setupController: function setupController(controller, model) {
+			_ember['default'].Instrumentation.subscribe("signalr.setReservation", {
+				before: function before(name, timestamp, payload) {
+					console.log('Recieved ', name, ' at ' + timestamp + ' with payload: ', payload);
+					controller.send('setReservation', payload);
+				},
+				after: function after() {}
+			});
+			controller.set('model', model);
 		}
 	});
 });
 define("client/pods/level/template", ["exports"], function (exports) {
-  exports["default"] = Ember.HTMLBars.template({ "id": "/Vo2tGBq", "block": "{\"statements\":[[\"block\",[\"page-view\"],null,[[\"scrollToTop\"],[true]],1],[\"text\",\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"    \\t\\t\"],[\"open-element\",\"a\",[]],[\"static-attr\",\"href\",\"#!\"],[\"static-attr\",\"class\",\"collection-item\"],[\"flush-element\"],[\"open-element\",\"span\",[]],[\"static-attr\",\"class\",\"badge availability\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"g.free\"],null],false],[\"close-element\"],[\"append\",[\"unknown\",[\"seat\",\"name\"]],false],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[\"seat\"]},{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"static-attr\",\"id\",\"index-banner\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m7\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"blockquote\",[]],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"h4\",[]],[\"flush-element\"],[\"append\",[\"unknown\",[\"model\",\"name\"]],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"g.seats\"],[[\"count\"],[[\"get\",[\"model\",\"seat\",\"length\"]]]]],false],[\"close-element\"],[\"text\",\"\\n    \\t\\t\"],[\"close-element\"],[\"text\",\"\\n    \\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"collection\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"each\"],[[\"get\",[\"model\",\"seat\"]]],null,0],[\"text\",\"    \"],[\"comment\",\"a href=\\\"#!\\\" class=\\\"collection-item\\\"><span class=\\\"new badge\\\">4</span>Alan</a\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\n\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m5\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"toc-wrapper\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"append\",[\"unknown\",[\"post-question\"]],false],[\"text\",\"\\t\\t\\t\\t\\n\"],[\"text\",\"\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/level/template.hbs" } });
+  exports["default"] = Ember.HTMLBars.template({ "id": "Y/C0CzQv", "block": "{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"static-attr\",\"id\",\"index-banner\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m7\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"blockquote\",[]],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"h4\",[]],[\"flush-element\"],[\"append\",[\"unknown\",[\"model\",\"name\"]],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"g.seats\"],[[\"count\"],[[\"get\",[\"model\",\"seat\",\"length\"]]]]],false],[\"close-element\"],[\"text\",\"\\n    \\t\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"calendarOpen\"]]],null,1],[\"text\",\"    \\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"collection\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"each\"],[[\"get\",[\"model\",\"seat\"]]],null,0],[\"text\",\"    \"],[\"comment\",\"a href=\\\"#!\\\" class=\\\"collection-item\\\"><span class=\\\"new badge\\\">4</span>Alan</a\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\n\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m5\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"toc-wrapper\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"append\",[\"unknown\",[\"post-question\"]],false],[\"text\",\"\\t\\t\\t\\t\\n\"],[\"text\",\"\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"    \\t\\t\"],[\"open-element\",\"a\",[]],[\"static-attr\",\"href\",\"#\"],[\"static-attr\",\"class\",\"collection-item\"],[\"modifier\",[\"action\"],[[\"get\",[null]],\"setReservation\",[\"get\",[\"seat\",\"id\"]]],[[\"preventDefault\"],[false]]],[\"flush-element\"],[\"append\",[\"unknown\",[\"seat\",\"name\"]],false],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[\"seat\"]},{\"statements\":[[\"text\",\"\\t\\t\\t\"],[\"append\",[\"helper\",[\"placc-calendar\"],null,[[\"onReserv\",\"onRelease\",\"onClose\",\"reservations\",\"ownerId\"],[[\"helper\",[\"action\"],[[\"get\",[null]],\"onReserve\"],null],[\"helper\",[\"action\"],[[\"get\",[null]],\"onRelease\"],null],[\"helper\",[\"action\"],[[\"get\",[null]],\"onCloseCalendar\"],null],[\"get\",[\"reservations\"]],[\"get\",[\"userId\"]]]]],false],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/level/template.hbs" } });
 });
 define('client/pods/privacy/route', ['exports', 'ember'], function (exports, _ember) {
   exports['default'] = _ember['default'].Route.extend({});
@@ -1924,13 +2242,18 @@ define("client/pods/profile/forgotpwd/template", ["exports"], function (exports)
   exports["default"] = Ember.HTMLBars.template({ "id": "1x95sMey", "block": "{\"statements\":[[\"open-element\",\"form\",[]],[\"modifier\",[\"action\"],[[\"get\",[null]],\"sendResetPasswordEmail\"],[[\"on\"],[\"submit\"]]],[\"flush-element\"],[\"text\",\"\\n\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-content\"],[\"flush-element\"],[\"text\",\"\\n  \"],[\"open-element\",\"span\",[]],[\"static-attr\",\"class\",\"card-title\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"forgot.title\"],null],false],[\"close-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"forgot.text\"],null],false],[\"close-element\"],[\"text\",\"  \\n  \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"input-field col s12\"],[\"flush-element\"],[\"text\",\"\\n      \"],[\"append\",[\"helper\",[\"q-input\"],null,[[\"type\",\"class\",\"id\",\"isValid\",\"value\",\"update\"],[\"text\",\"\",\"email\",[\"helper\",[\"get\"],[[\"helper\",[\"get\"],[[\"get\",[null,\"validations\",\"attrs\"]],\"email\"],null],\"isValid\"],null],[\"get\",[\"email\"]],[\"helper\",[\"action\"],[[\"get\",[null]],[\"helper\",[\"mut\"],[[\"get\",[\"email\"]]],null]],null]]]],false],[\"text\",\"\\n      \"],[\"open-element\",\"label\",[]],[\"static-attr\",\"for\",\"email\"],[\"dynamic-attr\",\"class\",[\"concat\",[[\"helper\",[\"if\"],[[\"get\",[\"email\"]],\"active\"],null]]]],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"signup.email\"],null],false],[\"close-element\"],[\"text\",\"\\n    \"],[\"close-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"input-field col s12\"],[\"flush-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"button\",[]],[\"static-attr\",\"class\",\"btn waves-effect waves-light\"],[\"static-attr\",\"type\",\"submit\"],[\"dynamic-attr\",\"disabled\",[\"helper\",[\"get\"],[[\"get\",[null,\"validations\"]],\"isInvalid\"],null],null],[\"static-attr\",\"name\",\"action\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"forgot.change_request\"],null],false],[\"close-element\"],[\"text\",\" \\n    \"],[\"close-element\"],[\"text\",\"\\n \\n  \"],[\"close-element\"],[\"text\",\"\\n\\n\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/profile/forgotpwd/template.hbs" } });
 });
 define('client/pods/profile/index/controller', ['exports', 'ember'], function (exports, _ember) {
-  exports['default'] = _ember['default'].Controller.extend({});
+   exports['default'] = _ember['default'].Controller.extend({
+      session: _ember['default'].inject.service(),
+      isLoggedIn: _ember['default'].computed.readOnly('session.isLoggedIn'),
+      username: _ember['default'].computed.readOnly('session.username')
+
+   });
 });
 define('client/pods/profile/index/route', ['exports', 'ember', 'client/config/environment'], function (exports, _ember, _clientConfigEnvironment) {
   exports['default'] = _ember['default'].Route.extend({});
 });
 define("client/pods/profile/index/template", ["exports"], function (exports) {
-  exports["default"] = Ember.HTMLBars.template({ "id": "29a2NXgW", "block": "{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card horizontal\"],[\"flush-element\"],[\"text\",\"\\n  \"],[\"comment\",\"div class=\\\"card-image\\\">\\n    <img src=\\\"/assets/images/card_bg.jpg\\\">\\n  </div\"],[\"text\",\"\\n  \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-stacked\"],[\"flush-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-content\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"isLoggedIn\"]]],null,1,0],[\"text\",\"\\t\"],[\"close-element\"],[\"text\",\"\\n    \"],[\"close-element\"],[\"text\",\"\\n    \"],[\"comment\",\"div class=\\\"card-action\\\">\\n      <a href=\\\"#\\\">This is a link</a>\\n    </div\"],[\"text\",\"\\n  \"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n           \\n\\n    \\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"\\tPlease login!\\n\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\tHello \"],[\"append\",[\"unknown\",[\"username\"]],false],[\"text\",\"! Lets make some reservations! \\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/profile/index/template.hbs" } });
+  exports["default"] = Ember.HTMLBars.template({ "id": "0DcreoZU", "block": "{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card horizontal\"],[\"flush-element\"],[\"text\",\"\\n  \"],[\"comment\",\"div class=\\\"card-image\\\">\\n    <img src=\\\"/assets/images/card_bg.jpg\\\">\\n  </div\"],[\"text\",\"\\n  \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-stacked\"],[\"flush-element\"],[\"text\",\"\\n    \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-content\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"isLoggedIn\"]]],null,2,0],[\"text\",\"\\t\"],[\"close-element\"],[\"text\",\"\\n    \"],[\"close-element\"],[\"text\",\"\\n    \"],[\"comment\",\"div class=\\\"card-action\\\">\\n      <a href=\\\"#\\\">This is a link</a>\\n    </div\"],[\"text\",\"\\n  \"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n           \\n\\n    \\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"\\tPlease login!\\n\"]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"take.seat\"],null],false]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\"],[\"open-element\",\"h4\",[]],[\"flush-element\"],[\"text\",\"Hello \"],[\"append\",[\"unknown\",[\"username\"]],false],[\"text\",\"!\"],[\"close-element\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"block\",[\"link-to\"],[\"company\",1],[[\"class\"],[\"waves-effect waves-light btn white-text\"]],1],[\"close-element\"],[\"text\",\" \\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/profile/index/template.hbs" } });
 });
 define('client/pods/profile/modify/controller', ['exports', 'ember', 'client/app'], function (exports, _ember, _clientApp) {
     exports['default'] = _ember['default'].Controller.extend({
@@ -2044,7 +2367,6 @@ define('client/pods/profile/signup/controller', ['exports', 'ember', 'client/app
                     _ember['default'].Logger.debug('signup error');
                     _ember['default'].Logger.debug(result);
                     self.get('modal').openInfoModal({ header: 'Sign up error', text: "We can't save your registration! " + result });
-                    _ember['default'].Logger.error(result);
                 });
             }
         }
@@ -2061,7 +2383,7 @@ define("client/pods/profile/signup/template", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template({ "id": "HDIybp5d", "block": "{\"statements\":[[\"append\",[\"helper\",[\"q-signup\"],null,[[\"user\",\"save\"],[[\"get\",[\"model\"]],[\"helper\",[\"action\"],[[\"get\",[null]],\"saveUserData\"],null]]]],false],[\"text\",\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/profile/signup/template.hbs" } });
 });
 define("client/pods/profile/template", ["exports"], function (exports) {
-  exports["default"] = Ember.HTMLBars.template({ "id": "j2ikXrwQ", "block": "{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"static-attr\",\"id\",\"index-banner\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m5 push-m7\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card registration\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"isLoggedIn\"]]],null,16],[\"text\",\"\\n\"],[\"block\",[\"unless\"],[[\"get\",[\"isLoggedIn\"]]],null,5,2],[\"text\",\"\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\n\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m7 pull-m5\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"comment\",\"div class=\\\"q-link collection\\\">\\n\\t\\t\\t{{#link-to 'profile.index' class=\\\"collection-item\\\"}}{{t 'profile.reservations'}}{{/link-to}}\\n\\t\\t\\t{{#link-to 'profile.places' class=\\\"collection-item\\\"}}{{t 'profile.places'}} <span class=\\\"count badge\\\">2 </span>{{/link-to}}\\n\\t\\t\\t\\n\\t\\t\\t\\t</div\"],[\"text\",\"\\n\\t\\t\\t\"],[\"append\",[\"unknown\",[\"outlet\"]],false],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"profile.change_data\"],null],false]],\"locals\":[]},{\"statements\":[[\"text\",\"   \\t\\t\\t\\t\\t  \\t\"],[\"open-element\",\"span\",[]],[\"static-attr\",\"class\",\"icon-text\"],[\"flush-element\"],[\"open-element\",\"i\",[]],[\"static-attr\",\"class\",\"material-icons\"],[\"flush-element\"],[\"text\",\"account_circle\"],[\"close-element\"],[\"text\",\" \"],[\"append\",[\"unknown\",[\"user\",\"name\"]],false],[\"close-element\"],[\"open-element\",\"br\",[]],[\"flush-element\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-content\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"user\",\"name\"]]],null,1],[\"text\",\"    \\t\\t\\t\\t\\t\"],[\"open-element\",\"span\",[]],[\"static-attr\",\"class\",\"icon-text\"],[\"flush-element\"],[\"open-element\",\"i\",[]],[\"static-attr\",\"class\",\"material-icons\"],[\"flush-element\"],[\"text\",\"contact_mail\"],[\"close-element\"],[\"text\",\" \"],[\"append\",[\"unknown\",[\"user\",\"email\"]],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-action\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"block\",[\"link-to\"],[\"profile.modify\"],null,0],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"open-element\",\"a\",[]],[\"static-attr\",\"href\",\"#\"],[\"static-attr\",\"class\",\"right\"],[\"modifier\",[\"action\"],[[\"get\",[null]],\"signout\"]],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"profile.signout\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"login.signup\"],null],false]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"general.forgot_password\"],null],false]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-content\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"form\",[]],[\"modifier\",[\"action\"],[[\"get\",[null]],\"loginAction\"],[[\"on\"],[\"submit\"]]],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"input-field col s12\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t  \"],[\"open-element\",\"label\",[]],[\"static-attr\",\"for\",\"loginname\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"login.login\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t  \"],[\"append\",[\"helper\",[\"q-input\"],null,[[\"value\",\"class\",\"valid\",\"update\",\"id\"],[[\"get\",[\"loginname\"]],\"validate\",true,[\"helper\",[\"action\"],[[\"get\",[null]],[\"helper\",[\"mut\"],[[\"get\",[\"loginname\"]]],null]],null],\"loginname\"]]],false],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"input-field col s12\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t  \"],[\"open-element\",\"label\",[]],[\"static-attr\",\"for\",\"loginpassword\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"login.password\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t  \"],[\"append\",[\"helper\",[\"q-input\"],null,[[\"type\",\"value\",\"isValid\",\"update\",\"id\"],[\"password\",[\"get\",[\"loginpassword\"]],true,[\"helper\",[\"action\"],[[\"get\",[null]],[\"helper\",[\"mut\"],[[\"get\",[\"loginpassword\"]]],null]],null],\"loginpassword\"]]],false],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s6\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"button\",[]],[\"static-attr\",\"class\",\"btn waves-effect waves-light\"],[\"static-attr\",\"type\",\"submit\"],[\"static-attr\",\"name\",\"action\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"login.send_login\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\" \\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"s6 col\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t    \"],[\"block\",[\"link-to\"],[\"profile.forgotpwd\"],null,4],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"s12 col padding-bottom foreign-login\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"br\",[]],[\"flush-element\"],[\"close-element\"],[\"block\",[\"link-to\"],[\"profile.signup\"],[[\"class\"],[\"signup-link\"]],3],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"  \\t\\t            \\t\\t    \\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\" \\n\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\"],[\"comment\",\"div class=\\\"social-action\\\">\\n\\t\\t\\t\\t\\t<div>\\n\\t\\t\\t\\t\\t\\t<form method=\\\"post\\\" id=\\\"facebookPost\\\" action=\\\"/api/facebooklogin\\\">\\n\\t\\t\\t\\t\\t\\t<a href=\\\"#\\\" class=\\\"btn waves-effect waves-light facebook-button\\\" {{action 'facebooklogin'}}>{{t 'login.facebook'}}</a>\\n\\t\\t\\t\\t\\t\\t</form>\\n\\t\\t\\t\\t\\t</div>\\n\\t\\t\\t\\t\\t<div>\\n\\t\\t\\t\\t\\t\\t<form method=\\\"post\\\" id=\\\"googlePost\\\" action=\\\"/api/googlelogin\\\">\\n\\t\\t\\t\\t\\t\\t<a href=\\\"#\\\" class=\\\"btn waves-effect waves-light google-button\\\" {{action 'googlelogin'}}>{{t 'login.google'}}</a>\\n\\t\\t\\t\\t\\t\\t</form>\\n\\t\\t\\t\\t\\t</div>\\n\\t\\t\\t\\t\\t</div\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\\t    \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"profileimg\"],[\"dynamic-attr\",\"style\",[\"concat\",[\"background-image:url(\",[\"unknown\",[\"avatarProfileUrl\"]],\");\"]]],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t        \\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\t\\n\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"profileimg\"],[\"dynamic-attr\",\"style\",[\"concat\",[\"background-image:url(\",[\"unknown\",[\"uploadFileUrl\"]],\");\"]]],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t        \\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\n\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\\t\\t\\t          \"],[\"open-element\",\"a\",[]],[\"static-attr\",\"id\",\"upload-image\"],[\"static-attr\",\"style\",\"font-size:12px;line-height:16px;color:#888;cursor: pointer;cursor:hand;\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\\t\\t          \"],[\"open-element\",\"i\",[]],[\"static-attr\",\"class\",\"material-icons\"],[\"static-attr\",\"style\",\"font-size:2em;line-height:16px;\"],[\"flush-element\"],[\"text\",\"add_a_photo\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\\t\\t          \"],[\"open-element\",\"b\",[]],[\"flush-element\"],[\"text\",\"Click to upload (160x160 px)\"],[\"close-element\"],[\"close-element\"],[\"text\",\"  \\n\"]],\"locals\":[]},{\"statements\":[[\"block\",[\"if\"],[[\"get\",[\"dropzone\",\"enabled\"]]],null,8]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\\t\\t\\t          Invalid\\n\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\\t\\t\\t          Drop now\\n\"]],\"locals\":[]},{\"statements\":[[\"block\",[\"if\"],[[\"get\",[\"dropzone\",\"valid\"]]],null,11,10]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\\t\\t\\t      \"],[\"open-element\",\"div\",[]],[\"static-attr\",\"style\",\"top:0px;position:absolute;width:100%;text-align:center;background-color:rgba(255,255,255,0.5);padding:1em\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"dropzone\",\"active\"]]],null,12,9],[\"text\",\"\\t\\t\\t\\t\\t\\t\\t\\t      \"],[\"close-element\"],[\"text\",\" \\n\"]],\"locals\":[\"queue\",\"dropzone\"]},{\"statements\":[[\"text\",\"\\n\"],[\"block\",[\"q-uploader\"],null,[[\"for-dropzone\",\"for\",\"url\",\"extensions\",\"multiple\",\"onfileadd\"],[\"upload-image\",\"upload-image\",\"uploadfile\",\"jpg jpeg png gif\",\"false\",\"setUploadImage\"]],13],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"style\",\"top:0px;position:absolute;width:100%;text-align:center;background-color:rgba(255,255,255,0.5);padding:1em\"],[\"flush-element\"],[\"text\",\"\\n\\n\\t\\t\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"a\",[]],[\"static-attr\",\"id\",\"upload-image\"],[\"static-attr\",\"class\",\"btn\"],[\"static-attr\",\"style\",\"padding:0 0.5em\"],[\"modifier\",[\"action\"],[[\"get\",[null]],\"acceptPhoto\"]],[\"flush-element\"],[\"open-element\",\"i\",[]],[\"static-attr\",\"class\",\"material-icons\"],[\"static-attr\",\"style\",\"font-size:2em;line-height:16px;\"],[\"flush-element\"],[\"text\",\"done\"],[\"close-element\"],[\"close-element\"],[\"text\",\"  \\n\\t\\t\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"a\",[]],[\"static-attr\",\"id\",\"upload-image\"],[\"static-attr\",\"class\",\"btn error\"],[\"static-attr\",\"style\",\"padding:0 0.5em; background-color:#CC0030\"],[\"modifier\",[\"action\"],[[\"get\",[null]],\"cancelPhoto\"]],[\"flush-element\"],[\"open-element\",\"i\",[]],[\"static-attr\",\"class\",\"material-icons\"],[\"static-attr\",\"style\",\"font-size:2em;line-height:16px;\"],[\"flush-element\"],[\"text\",\"clear\"],[\"close-element\"],[\"close-element\"],[\"text\",\"  \\n\\n\\t\\t\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\" \\n\\n\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-image\"],[\"static-attr\",\"style\",\"background-image:url('/assets/images/profile.jpg')\"],[\"dynamic-attr\",\"id\",[\"unknown\",[\"dropzone\",\"id\"]],null],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"uploadFileUrl\"]]],null,15,14],[\"block\",[\"if\"],[[\"get\",[\"uploadFileUrl\"]]],null,7,6],[\"text\",\"\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"span\",[]],[\"static-attr\",\"class\",\"card-title white-text\"],[\"flush-element\"],[\"append\",[\"unknown\",[\"displayName\"]],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/profile/template.hbs" } });
+  exports["default"] = Ember.HTMLBars.template({ "id": "TrVfPOX9", "block": "{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"static-attr\",\"id\",\"index-banner\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m5 push-m7\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card registration\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\"],[\"comment\",\"\\n{{!#if isLoggedIn}}\\t\\t\\t\\t\\t\\t<div class=\\\"card-image\\\" style=\\\"background-image:url('/assets/images/profile.jpg')\\\" id={{dropzone.id}}>\\n{{!#if uploadFileUrl}}\\t\\t\\t\\t\\t\\t\\t\\t<div style=\\\"top:0px;position:absolute;width:100%;text-align:center;background-color:rgba(255,255,255,0.5);padding:1em\\\">\\n\\n\\t\\t\\t\\t\\t\\t\\t\\t<a id=\\\"upload-image\\\" class=\\\"btn\\\" style=\\\"padding:0 0.5em\\\" {{action 'acceptPhoto'}}><i class=\\\"material-icons\\\" style=\\\"font-size:2em;line-height:16px;\\\">done</i></a>  \\n\\t\\t\\t\\t\\t\\t\\t\\t<a id=\\\"upload-image\\\" class=\\\"btn error\\\" style=\\\"padding:0 0.5em; background-color:#CC0030\\\" {{action 'cancelPhoto'}}><i class=\\\"material-icons\\\" style=\\\"font-size:2em;line-height:16px;\\\">clear</i></a>  \\n\\n\\t\\t\\t\\t\\t\\t\\t\\t</div> \\n\\n{{!else}}\\n{{!#q-uploader for-dropzone=\\\"upload-image\\\" for=\\\"upload-image\\\" url=\\\"uploadfile\\\" extensions=\\\"jpg jpeg png gif\\\" multiple=\\\"false\\\" onfileadd=\\\"setUploadImage\\\" as |queue dropzone|}}\\t\\t\\t\\t\\t\\t\\t\\t      <div style=\\\"top:0px;position:absolute;width:100%;text-align:center;background-color:rgba(255,255,255,0.5);padding:1em\\\">\\n{{#if dropzone.active}}\\n\\t\\t\\t\\t\\t\\t\\t\\t        {{#if dropzone.valid}}\\n\\t\\t\\t\\t\\t\\t\\t\\t          Drop now\\n\\t\\t\\t\\t\\t\\t\\t\\t        {{else}}\\n\\t\\t\\t\\t\\t\\t\\t\\t          Invalid\\n\\t\\t\\t\\t\\t\\t\\t\\t        {{/if}}\\n\\t\\t\\t\\t\\t\\t\\t\\t      {{else}}\\n\\t\\t\\t\\t\\t\\t\\t\\t        {{#if dropzone.enabled}}\\n\\t\\t\\t\\t\\t\\t\\t\\t          <a id=\\\"upload-image\\\" style=\\\"font-size:12px;line-height:16px;color:#888;cursor: pointer;cursor:hand;\\\">\\n\\t\\t\\t\\t\\t\\t\\t\\t          <i class=\\\"material-icons\\\" style=\\\"font-size:2em;line-height:16px;\\\">add_a_photo</i>\\n\\t\\t\\t\\t\\t\\t\\t\\t          <b>Click to upload (160x160 px)</b></a>  \\n\\t\\t\\t\\t\\t\\t\\t\\t        {{/if}}\\n\\t\\t\\t\\t\\t\\t\\t\\t      {{/if}}\\t\\t\\t\\t\\t\\t\\t\\t      </div> \\n{{!/q-uploader}}\\n{{!/if}}{{!#if uploadFileUrl}}\\t\\t\\t\\t\\t\\t\\t<div class=\\\"profileimg\\\" style=\\\"background-image:url({{uploadFileUrl}});\\\">\\n\\t\\t\\t\\t        \\t</div>\\t\\t\\t\\n{{!else}}\\t\\t\\t\\t\\t\\t    <div class=\\\"profileimg\\\" style=\\\"background-image:url({{avatarProfileUrl}});\\\">\\n\\t\\t\\t\\t        \\t</div>\\t\\t\\t\\t\\n{{!/if}}\\t\\t\\t\\t\\t\\t<span class=\\\"card-title white-text\\\">{{displayName}}</span>\\n\\t\\t\\t\\t\\t\\t</div>\\n{{!/if}}\\t\\t\\t\\t\"],[\"text\",\"\\n\"],[\"block\",[\"unless\"],[[\"get\",[\"isLoggedIn\"]]],null,5,2],[\"text\",\"\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\n\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m7 pull-m5\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"comment\",\"div class=\\\"q-link collection\\\">\\n\\t\\t\\t{{#link-to 'profile.index' class=\\\"collection-item\\\"}}{{t 'profile.reservations'}}{{/link-to}}\\n\\t\\t\\t{{#link-to 'profile.places' class=\\\"collection-item\\\"}}{{t 'profile.places'}} <span class=\\\"count badge\\\">2 </span>{{/link-to}}\\n\\t\\t\\t\\n\\t\\t\\t\\t</div\"],[\"text\",\"\\n\\t\\t\\t\"],[\"append\",[\"unknown\",[\"outlet\"]],false],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"profile.change_data\"],null],false]],\"locals\":[]},{\"statements\":[[\"text\",\"   \\t\\t\\t\\t\\t  \\t\"],[\"open-element\",\"span\",[]],[\"static-attr\",\"class\",\"icon-text\"],[\"flush-element\"],[\"open-element\",\"i\",[]],[\"static-attr\",\"class\",\"material-icons\"],[\"flush-element\"],[\"text\",\"account_circle\"],[\"close-element\"],[\"text\",\" \"],[\"append\",[\"unknown\",[\"user\",\"name\"]],false],[\"close-element\"],[\"open-element\",\"br\",[]],[\"flush-element\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-content\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"user\",\"name\"]]],null,1],[\"text\",\"    \\t\\t\\t\\t\\t\"],[\"open-element\",\"span\",[]],[\"static-attr\",\"class\",\"icon-text\"],[\"flush-element\"],[\"open-element\",\"i\",[]],[\"static-attr\",\"class\",\"material-icons\"],[\"flush-element\"],[\"text\",\"contact_mail\"],[\"close-element\"],[\"text\",\" \"],[\"append\",[\"unknown\",[\"user\",\"email\"]],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-action\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"block\",[\"link-to\"],[\"profile.modify\"],null,0],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"open-element\",\"a\",[]],[\"static-attr\",\"href\",\"#\"],[\"static-attr\",\"class\",\"right\"],[\"modifier\",[\"action\"],[[\"get\",[null]],\"signout\"]],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"profile.signout\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"login.signup\"],null],false]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"general.forgot_password\"],null],false]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-content\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"form\",[]],[\"modifier\",[\"action\"],[[\"get\",[null]],\"loginAction\"],[[\"on\"],[\"submit\"]]],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"input-field col s12\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t  \"],[\"open-element\",\"label\",[]],[\"static-attr\",\"for\",\"loginname\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"login.login\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t  \"],[\"append\",[\"helper\",[\"q-input\"],null,[[\"value\",\"class\",\"valid\",\"update\",\"id\"],[[\"get\",[\"loginname\"]],\"validate\",true,[\"helper\",[\"action\"],[[\"get\",[null]],[\"helper\",[\"mut\"],[[\"get\",[\"loginname\"]]],null]],null],\"loginname\"]]],false],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"input-field col s12\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t  \"],[\"open-element\",\"label\",[]],[\"static-attr\",\"for\",\"loginpassword\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"login.password\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t  \"],[\"append\",[\"helper\",[\"q-input\"],null,[[\"type\",\"value\",\"isValid\",\"update\",\"id\"],[\"password\",[\"get\",[\"loginpassword\"]],true,[\"helper\",[\"action\"],[[\"get\",[null]],[\"helper\",[\"mut\"],[[\"get\",[\"loginpassword\"]]],null]],null],\"loginpassword\"]]],false],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s6\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"button\",[]],[\"static-attr\",\"class\",\"btn waves-effect waves-light\"],[\"static-attr\",\"type\",\"submit\"],[\"static-attr\",\"name\",\"action\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"login.send_login\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\" \\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"s6 col\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t    \"],[\"block\",[\"link-to\"],[\"profile.forgotpwd\"],null,4],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"s12 col padding-bottom foreign-login\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"open-element\",\"br\",[]],[\"flush-element\"],[\"close-element\"],[\"block\",[\"link-to\"],[\"profile.signup\"],[[\"class\"],[\"signup-link\"]],3],[\"text\",\"\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"  \\t\\t            \\t\\t    \\n\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\" \\n\\t\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\t\\t\\n\\t\\t\\t\\t\\t\"],[\"comment\",\"div class=\\\"social-action\\\">\\n\\t\\t\\t\\t\\t<div>\\n\\t\\t\\t\\t\\t\\t<form method=\\\"post\\\" id=\\\"facebookPost\\\" action=\\\"/api/facebooklogin\\\">\\n\\t\\t\\t\\t\\t\\t<a href=\\\"#\\\" class=\\\"btn waves-effect waves-light facebook-button\\\" {{action 'facebooklogin'}}>{{t 'login.facebook'}}</a>\\n\\t\\t\\t\\t\\t\\t</form>\\n\\t\\t\\t\\t\\t</div>\\n\\t\\t\\t\\t\\t<div>\\n\\t\\t\\t\\t\\t\\t<form method=\\\"post\\\" id=\\\"googlePost\\\" action=\\\"/api/googlelogin\\\">\\n\\t\\t\\t\\t\\t\\t<a href=\\\"#\\\" class=\\\"btn waves-effect waves-light google-button\\\" {{action 'googlelogin'}}>{{t 'login.google'}}</a>\\n\\t\\t\\t\\t\\t\\t</form>\\n\\t\\t\\t\\t\\t</div>\\n\\t\\t\\t\\t\\t</div\"],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/profile/template.hbs" } });
 });
 define('client/pods/terms/route', ['exports', 'ember'], function (exports, _ember) {
   exports['default'] = _ember['default'].Route.extend({});
@@ -2097,6 +2419,7 @@ define('client/router', ['exports', 'ember', 'client/config/environment'], funct
       this.route("language", { path: "language" });
     });
     this.route('company', { path: 'company/:company_id' });
+    this.route('activate', { path: '/activate/:code/:email' });
   });
 
   exports['default'] = Router;
@@ -2797,7 +3120,7 @@ catch(err) {
 /* jshint ignore:start */
 
 if (!runningTests) {
-  require("client/app")["default"].create({"perPage":5,"name":"client","version":"0.0.0+"});
+  require("client/app")["default"].create({"perPage":5,"name":"client","version":"0.0.0+cd0aa389"});
 }
 
 /* jshint ignore:end */

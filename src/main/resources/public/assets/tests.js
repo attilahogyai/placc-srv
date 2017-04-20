@@ -72,6 +72,15 @@ define('client/tests/helpers/and-b.jshint.lint-test', ['exports'], function (exp
     assert.ok(true, 'helpers/and-b.js should pass jshint.');
   });
 });
+define('client/tests/helpers/date-format.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | helpers/date-format.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'helpers/date-format.js should pass jshint.');
+  });
+});
 define('client/tests/helpers/destroy-app', ['exports', 'ember'], function (exports, _ember) {
   exports['default'] = destroyApp;
 
@@ -121,6 +130,24 @@ define('client/tests/helpers/ember-i18n/test-helpers', ['exports', 'ember'], fun
     }
   })();
 });
+define('client/tests/helpers/eq-o.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | helpers/eq-o.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'helpers/eq-o.js should pass jshint.');
+  });
+});
+define('client/tests/helpers/find-reservation.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | helpers/find-reservation.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'helpers/find-reservation.js should pass jshint.');
+  });
+});
 define('client/tests/helpers/gt-num.jshint.lint-test', ['exports'], function (exports) {
   'use strict';
 
@@ -128,6 +155,15 @@ define('client/tests/helpers/gt-num.jshint.lint-test', ['exports'], function (ex
   QUnit.test('should pass jshint', function (assert) {
     assert.expect(1);
     assert.ok(true, 'helpers/gt-num.js should pass jshint.');
+  });
+});
+define('client/tests/helpers/is-today.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | helpers/is-today.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'helpers/is-today.js should pass jshint.');
   });
 });
 define('client/tests/helpers/module-for-acceptance', ['exports', 'qunit', 'ember', 'client/tests/helpers/start-app', 'client/tests/helpers/destroy-app'], function (exports, _qunit, _ember, _clientTestsHelpersStartApp, _clientTestsHelpersDestroyApp) {
@@ -369,6 +405,44 @@ define('client/tests/integration/pods/components/header-profile-box/component-te
     assert.ok(true, 'integration/pods/components/header-profile-box/component-test.js should pass jshint.');
   });
 });
+define('client/tests/integration/pods/components/placc-calendar/component-test', ['exports', 'ember-qunit'], function (exports, _emberQunit) {
+
+  (0, _emberQunit.moduleForComponent)('placc-calendar', 'Integration | Component | placc calendar', {
+    integration: true
+  });
+
+  (0, _emberQunit.test)('it renders', function (assert) {
+
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template({
+      'id': 'bVRvLi9J',
+      'block': '{"statements":[["append",["unknown",["placc-calendar"]],false]],"locals":[],"named":[],"yields":[],"blocks":[],"hasPartials":false}',
+      'meta': {}
+    }));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template({
+      'id': 'tqiOXvUF',
+      'block': '{"statements":[["text","\\n"],["block",["placc-calendar"],null,null,0],["text","  "]],"locals":[],"named":[],"yields":[],"blocks":[{"statements":[["text","      template block text\\n"]],"locals":[]}],"hasPartials":false}',
+      'meta': {}
+    }));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+});
+define('client/tests/integration/pods/components/placc-calendar/component-test.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | integration/pods/components/placc-calendar/component-test.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/pods/components/placc-calendar/component-test.js should pass jshint.');
+  });
+});
 define('client/tests/integration/pods/components/profile-card/component-test', ['exports', 'ember-qunit'], function (exports, _emberQunit) {
 
   (0, _emberQunit.moduleForComponent)('profile-card', 'Integration | Component | profile card', {
@@ -488,6 +562,33 @@ define('client/tests/models/user.jshint.lint-test', ['exports'], function (expor
     assert.ok(true, 'models/user.js should pass jshint.');
   });
 });
+define('client/tests/models/useracc.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | models/useracc.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'models/useracc.js should pass jshint.');
+  });
+});
+define('client/tests/pods/activate/controller.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | pods/activate/controller.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'pods/activate/controller.js should pass jshint.');
+  });
+});
+define('client/tests/pods/activate/route.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | pods/activate/route.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'pods/activate/route.js should pass jshint.');
+  });
+});
 define('client/tests/pods/admin/language/controller.jshint.lint-test', ['exports'], function (exports) {
   'use strict';
 
@@ -578,6 +679,15 @@ define('client/tests/pods/components/info-modal/component.jshint.lint-test', ['e
     assert.ok(true, 'pods/components/info-modal/component.js should pass jshint.');
   });
 });
+define('client/tests/pods/components/placc-calendar/component.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | pods/components/placc-calendar/component.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'pods/components/placc-calendar/component.js should pass jshint.');
+  });
+});
 define('client/tests/pods/components/post-question/component.jshint.lint-test', ['exports'], function (exports) {
   'use strict';
 
@@ -648,6 +758,15 @@ define('client/tests/pods/index/route.jshint.lint-test', ['exports'], function (
   QUnit.test('should pass jshint', function (assert) {
     assert.expect(1);
     assert.ok(true, 'pods/index/route.js should pass jshint.');
+  });
+});
+define('client/tests/pods/level/controller.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | pods/level/controller.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'pods/level/controller.js should pass jshint.\npods/level/controller.js: line 38, col 15, Missing semicolon.\n\n1 error');
   });
 });
 define('client/tests/pods/level/route.jshint.lint-test', ['exports'], function (exports) {
@@ -952,6 +1071,44 @@ define('client/tests/unit/building/route-test.jshint.lint-test', ['exports'], fu
   QUnit.test('should pass jshint', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/building/route-test.js should pass jshint.');
+  });
+});
+define('client/tests/unit/helpers/date-format-test', ['exports', 'client/helpers/date-format', 'qunit'], function (exports, _clientHelpersDateFormat, _qunit) {
+
+  (0, _qunit.module)('Unit | Helper | date format');
+
+  // Replace this with your real tests.
+  (0, _qunit.test)('it works', function (assert) {
+    var result = (0, _clientHelpersDateFormat.dateFormat)([42]);
+    assert.ok(result);
+  });
+});
+define('client/tests/unit/helpers/date-format-test.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | unit/helpers/date-format-test.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/helpers/date-format-test.js should pass jshint.');
+  });
+});
+define('client/tests/unit/helpers/is-today-test', ['exports', 'client/helpers/is-today', 'qunit'], function (exports, _clientHelpersIsToday, _qunit) {
+
+  (0, _qunit.module)('Unit | Helper | is today');
+
+  // Replace this with your real tests.
+  (0, _qunit.test)('it works', function (assert) {
+    var result = (0, _clientHelpersIsToday.isToday)([42]);
+    assert.ok(result);
+  });
+});
+define('client/tests/unit/helpers/is-today-test.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | unit/helpers/is-today-test.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/helpers/is-today-test.js should pass jshint.');
   });
 });
 define('client/tests/unit/initializers/loader-test', ['exports', 'ember', 'client/initializers/loader', 'qunit', 'client/tests/helpers/destroy-app'], function (exports, _ember, _clientInitializersLoader, _qunit, _clientTestsHelpersDestroyApp) {

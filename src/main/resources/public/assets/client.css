@@ -1757,7 +1757,7 @@ $input-border-color: $off-black;
 .white {
   background-color: #FFFFFF !important; }
 
-.white-text {
+.white-text, .__placc-calendar__1938d_status_free, .__placc-calendar__1938d_status_reserved2_my, .__placc-calendar__1938d_status_reserved1 {
   color: #FFFFFF !important; }
 
 .transparent {
@@ -2138,10 +2138,10 @@ a {
   text-decoration: none;
   -webkit-tap-highlight-color: transparent; }
 
-.valign-wrapper {
+.valign-wrapper, .__placc-calendar__1938d_prev, .__placc-calendar__1938d_next {
   display: flex;
   align-items: center; }
-  .valign-wrapper .valign {
+  .valign-wrapper .valign, .__placc-calendar__1938d_prev .valign, .__placc-calendar__1938d_next .valign {
     display: block; }
 
 .clearfix {
@@ -2150,10 +2150,10 @@ a {
 .z-depth-0 {
   box-shadow: none !important; }
 
-.z-depth-1, nav, .card-panel, .card, .toast, .btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn, .btn-floating, .dropdown-content, .collapsible, .side-nav, .q-link.collection, .inv-accent-btn:hover {
+.z-depth-1, nav, .card-panel, .card, .toast, .btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn, .__placc-calendar__1938d_status_free, .__placc-calendar__1938d_status_reserved2_my, .__placc-calendar__1938d_status_reserved1, .btn-floating, .dropdown-content, .collapsible, .side-nav, .q-link.collection, .inv-accent-btn:hover {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2); }
 
-.z-depth-1-half, .btn:hover, .btn-large:hover, span.availability:hover, .accent-btn:hover, .inv-accent-btn:hover, .inv-btn:hover, .btn-floating:hover {
+.z-depth-1-half, .btn:hover, .btn-large:hover, span.availability:hover, .accent-btn:hover, .inv-accent-btn:hover, .inv-btn:hover, .__placc-calendar__1938d_status_free:hover, .__placc-calendar__1938d_status_reserved2_my:hover, .__placc-calendar__1938d_status_reserved1:hover, .btn-floating:hover {
   box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2); }
 
 .z-depth-2 {
@@ -2607,7 +2607,7 @@ td, th {
 .right-align {
   text-align: right; }
 
-.center, .center-align {
+.center, .center-align, .__placc-calendar__1938d_day_0, .__placc-calendar__1938d_day_1, .__placc-calendar__1938d_day_2, .__placc-calendar__1938d_day_3, .__placc-calendar__1938d_day_4, .__placc-calendar__1938d_day_5, .__placc-calendar__1938d_day_6, .__placc-calendar__1938d_prev, .__placc-calendar__1938d_next {
   text-align: center; }
 
 .left {
@@ -3213,11 +3213,11 @@ nav {
       display: block;
       padding: 0 15px;
       cursor: pointer; }
-      nav ul a.btn, nav ul a.btn-large, nav ul a.accent-btn, nav ul a.inv-accent-btn, nav ul a.inv-btn, nav ul a.btn-large, nav ul a.btn-flat, nav ul a.btn-floating {
+      nav ul a.btn, nav ul a.btn-large, nav ul a.accent-btn, nav ul a.inv-accent-btn, nav ul a.inv-btn, nav ul a.__placc-calendar__1938d_status_free, nav ul a.__placc-calendar__1938d_status_reserved2_my, nav ul a.__placc-calendar__1938d_status_reserved1, nav ul a.btn-large, nav ul a.btn-flat, nav ul a.btn-floating {
         margin-top: -2px;
         margin-left: 15px;
         margin-right: 15px; }
-        nav ul a.btn > .material-icons, nav ul a.btn-large > .material-icons, nav ul a.accent-btn > .material-icons, nav ul a.inv-accent-btn > .material-icons, nav ul a.inv-btn > .material-icons, nav ul a.btn-large > .material-icons, nav ul a.btn-flat > .material-icons, nav ul a.btn-floating > .material-icons {
+        nav ul a.btn > .material-icons, nav ul a.btn-large > .material-icons, nav ul a.accent-btn > .material-icons, nav ul a.inv-accent-btn > .material-icons, nav ul a.inv-btn > .material-icons, nav ul a.__placc-calendar__1938d_status_free > .material-icons, nav ul a.__placc-calendar__1938d_status_reserved2_my > .material-icons, nav ul a.__placc-calendar__1938d_status_reserved1 > .material-icons, nav ul a.btn-large > .material-icons, nav ul a.btn-flat > .material-icons, nav ul a.btn-floating > .material-icons {
           height: inherit;
           line-height: inherit; }
       nav ul a:hover {
@@ -3539,12 +3539,12 @@ small {
     background-color: inherit;
     border-top: 1px solid rgba(160, 160, 160, 0.2);
     padding: 16px 24px; }
-    .card .card-action a:not(.btn):not(.btn-large):not(span.availability):not(.accent-btn):not(.inv-accent-btn):not(.inv-btn):not(.btn-large):not(.btn-floating) {
+    .card .card-action a:not(.btn):not(.btn-large):not(span.availability):not(.accent-btn):not(.inv-accent-btn):not(.inv-btn):not(.__placc-calendar__1938d_status_free):not(.__placc-calendar__1938d_status_reserved2_my):not(.__placc-calendar__1938d_status_reserved1):not(.btn-large):not(.btn-floating) {
       color: #6ab7cb;
       margin-right: 24px;
       transition: color .3s ease;
       text-transform: uppercase; }
-      .card .card-action a:not(.btn):not(.btn-large):not(span.availability):not(.accent-btn):not(.inv-accent-btn):not(.inv-btn):not(.btn-large):not(.btn-floating):hover {
+      .card .card-action a:not(.btn):not(.btn-large):not(span.availability):not(.accent-btn):not(.inv-accent-btn):not(.inv-btn):not(.__placc-calendar__1938d_status_free):not(.__placc-calendar__1938d_status_reserved2_my):not(.__placc-calendar__1938d_status_reserved1):not(.btn-large):not(.btn-floating):hover {
         color: #7dc0d2; }
   .card .card-reveal {
     padding: 24px;
@@ -3600,7 +3600,7 @@ small {
   display: flex;
   align-items: center;
   justify-content: space-between; }
-  .toast .btn, .toast .btn-large, .toast span.availability, .toast .accent-btn, .toast .inv-accent-btn, .toast .inv-btn, .toast .btn-flat {
+  .toast .btn, .toast .btn-large, .toast span.availability, .toast .accent-btn, .toast .inv-accent-btn, .toast .inv-btn, .toast .__placc-calendar__1938d_status_free, .toast .__placc-calendar__1938d_status_reserved2_my, .toast .__placc-calendar__1938d_status_reserved1, .toast .btn-flat {
     margin: 0;
     margin-left: 3rem; }
   .toast.rounded {
@@ -3716,7 +3716,7 @@ small {
   transform-origin: 50% 0%;
   visibility: hidden; }
 
-.btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn,
+.btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn, .__placc-calendar__1938d_status_free, .__placc-calendar__1938d_status_reserved2_my, .__placc-calendar__1938d_status_reserved1,
 .btn-flat {
   border: none;
   border-radius: 2px;
@@ -3728,7 +3728,7 @@ small {
   vertical-align: middle;
   -webkit-tap-highlight-color: transparent; }
 
-.btn.disabled, .disabled.btn-large, span.disabled.availability, .disabled.accent-btn, .disabled.inv-accent-btn, .disabled.inv-btn,
+.btn.disabled, .disabled.btn-large, span.disabled.availability, .disabled.accent-btn, .disabled.inv-accent-btn, .disabled.inv-btn, .disabled.__placc-calendar__1938d_status_free, .disabled.__placc-calendar__1938d_status_reserved2_my, .disabled.__placc-calendar__1938d_status_reserved1,
 .btn-floating.disabled,
 .btn-large.disabled,
 .btn-flat.disabled,
@@ -3738,6 +3738,9 @@ span.availability:disabled,
 .accent-btn:disabled,
 .inv-accent-btn:disabled,
 .inv-btn:disabled,
+.__placc-calendar__1938d_status_free:disabled,
+.__placc-calendar__1938d_status_reserved2_my:disabled,
+.__placc-calendar__1938d_status_reserved1:disabled,
 .btn-floating:disabled,
 .btn-large:disabled,
 .btn-flat:disabled,
@@ -3747,6 +3750,9 @@ span[disabled].availability,
 [disabled].accent-btn,
 [disabled].inv-accent-btn,
 [disabled].inv-btn,
+[disabled].__placc-calendar__1938d_status_free,
+[disabled].__placc-calendar__1938d_status_reserved2_my,
+[disabled].__placc-calendar__1938d_status_reserved1,
 .btn-floating[disabled],
 .btn-large[disabled],
 .btn-flat[disabled] {
@@ -3755,7 +3761,7 @@ span[disabled].availability,
   box-shadow: none;
   color: #9F9F9F !important;
   cursor: default; }
-  .btn.disabled:hover, .disabled.btn-large:hover, span.disabled.availability:hover, .disabled.accent-btn:hover, .disabled.inv-accent-btn:hover, .disabled.inv-btn:hover,
+  .btn.disabled:hover, .disabled.btn-large:hover, span.disabled.availability:hover, .disabled.accent-btn:hover, .disabled.inv-accent-btn:hover, .disabled.inv-btn:hover, .disabled.__placc-calendar__1938d_status_free:hover, .disabled.__placc-calendar__1938d_status_reserved2_my:hover, .disabled.__placc-calendar__1938d_status_reserved1:hover,
   .btn-floating.disabled:hover,
   .btn-large.disabled:hover,
   .btn-flat.disabled:hover,
@@ -3765,6 +3771,9 @@ span[disabled].availability,
   .accent-btn:disabled:hover,
   .inv-accent-btn:disabled:hover,
   .inv-btn:disabled:hover,
+  .__placc-calendar__1938d_status_free:disabled:hover,
+  .__placc-calendar__1938d_status_reserved2_my:disabled:hover,
+  .__placc-calendar__1938d_status_reserved1:disabled:hover,
   .btn-floating:disabled:hover,
   .btn-large:disabled:hover,
   .btn-flat:disabled:hover,
@@ -3774,29 +3783,32 @@ span[disabled].availability,
   [disabled].accent-btn:hover,
   [disabled].inv-accent-btn:hover,
   [disabled].inv-btn:hover,
+  [disabled].__placc-calendar__1938d_status_free:hover,
+  [disabled].__placc-calendar__1938d_status_reserved2_my:hover,
+  [disabled].__placc-calendar__1938d_status_reserved1:hover,
   .btn-floating[disabled]:hover,
   .btn-large[disabled]:hover,
   .btn-flat[disabled]:hover {
     background-color: #DFDFDF !important;
     color: #9F9F9F !important; }
 
-.btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn,
+.btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn, .__placc-calendar__1938d_status_free, .__placc-calendar__1938d_status_reserved2_my, .__placc-calendar__1938d_status_reserved1,
 .btn-floating,
 .btn-large,
 .btn-flat {
   outline: 0; }
-  .btn i, .btn-large i, span.availability i, .accent-btn i, .inv-accent-btn i, .inv-btn i,
+  .btn i, .btn-large i, span.availability i, .accent-btn i, .inv-accent-btn i, .inv-btn i, .__placc-calendar__1938d_status_free i, .__placc-calendar__1938d_status_reserved2_my i, .__placc-calendar__1938d_status_reserved1 i,
   .btn-floating i,
   .btn-large i,
   .btn-flat i {
     font-size: 1.3rem;
     line-height: inherit; }
 
-.btn:focus, .btn-large:focus, span.availability:focus, .accent-btn:focus, .inv-accent-btn:focus, .inv-btn:focus,
+.btn:focus, .btn-large:focus, span.availability:focus, .accent-btn:focus, .inv-accent-btn:focus, .inv-btn:focus, .__placc-calendar__1938d_status_free:focus, .__placc-calendar__1938d_status_reserved2_my:focus, .__placc-calendar__1938d_status_reserved1:focus,
 .btn-floating:focus {
   background-color: #44a5be; }
 
-.btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn {
+.btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn, .__placc-calendar__1938d_status_free, .__placc-calendar__1938d_status_reserved2_my, .__placc-calendar__1938d_status_reserved1 {
   text-decoration: none;
   color: #fff;
   background-color: #6ab7cb;
@@ -3804,7 +3816,7 @@ span[disabled].availability,
   letter-spacing: .5px;
   transition: .2s ease-out;
   cursor: pointer; }
-  .btn:hover, .btn-large:hover, span.availability:hover, .accent-btn:hover, .inv-accent-btn:hover, .inv-btn:hover {
+  .btn:hover, .btn-large:hover, span.availability:hover, .accent-btn:hover, .inv-accent-btn:hover, .inv-btn:hover, .__placc-calendar__1938d_status_free:hover, .__placc-calendar__1938d_status_reserved2_my:hover, .__placc-calendar__1938d_status_reserved1:hover {
     background-color: #7dc0d2; }
 
 .btn-floating {
@@ -4005,7 +4017,7 @@ button.btn-floating {
  * Released under the MIT license
  * https://github.com/fians/Waves/blob/master/LICENSE
  */
-.waves-effect {
+.waves-effect, .__placc-calendar__1938d_status_free, .__placc-calendar__1938d_status_reserved2_my, .__placc-calendar__1938d_status_reserved1 {
   position: relative;
   cursor: pointer;
   display: inline-block;
@@ -4015,7 +4027,7 @@ button.btn-floating {
   vertical-align: middle;
   z-index: 1;
   transition: .3s ease-out; }
-  .waves-effect .waves-ripple {
+  .waves-effect .waves-ripple, .__placc-calendar__1938d_status_free .waves-ripple, .__placc-calendar__1938d_status_reserved2_my .waves-ripple, .__placc-calendar__1938d_status_reserved1 .waves-ripple {
     position: absolute;
     border-radius: 50%;
     width: 20px;
@@ -4028,27 +4040,27 @@ button.btn-floating {
     transition-property: transform, opacity;
     transform: scale(0);
     pointer-events: none; }
-  .waves-effect.waves-light .waves-ripple {
+  .waves-effect.waves-light .waves-ripple, .__placc-calendar__1938d_status_free .waves-ripple, .__placc-calendar__1938d_status_reserved2_my .waves-ripple, .__placc-calendar__1938d_status_reserved1 .waves-ripple {
     background-color: rgba(255, 255, 255, 0.45); }
-  .waves-effect.waves-red .waves-ripple {
+  .waves-effect.waves-red .waves-ripple, .waves-red.__placc-calendar__1938d_status_free .waves-ripple, .waves-red.__placc-calendar__1938d_status_reserved2_my .waves-ripple, .waves-red.__placc-calendar__1938d_status_reserved1 .waves-ripple {
     background-color: rgba(244, 67, 54, 0.7); }
-  .waves-effect.waves-yellow .waves-ripple {
+  .waves-effect.waves-yellow .waves-ripple, .waves-yellow.__placc-calendar__1938d_status_free .waves-ripple, .waves-yellow.__placc-calendar__1938d_status_reserved2_my .waves-ripple, .waves-yellow.__placc-calendar__1938d_status_reserved1 .waves-ripple {
     background-color: rgba(255, 235, 59, 0.7); }
-  .waves-effect.waves-orange .waves-ripple {
+  .waves-effect.waves-orange .waves-ripple, .waves-orange.__placc-calendar__1938d_status_free .waves-ripple, .waves-orange.__placc-calendar__1938d_status_reserved2_my .waves-ripple, .waves-orange.__placc-calendar__1938d_status_reserved1 .waves-ripple {
     background-color: rgba(255, 152, 0, 0.7); }
-  .waves-effect.waves-purple .waves-ripple {
+  .waves-effect.waves-purple .waves-ripple, .waves-purple.__placc-calendar__1938d_status_free .waves-ripple, .waves-purple.__placc-calendar__1938d_status_reserved2_my .waves-ripple, .waves-purple.__placc-calendar__1938d_status_reserved1 .waves-ripple {
     background-color: rgba(156, 39, 176, 0.7); }
-  .waves-effect.waves-green .waves-ripple {
+  .waves-effect.waves-green .waves-ripple, .waves-green.__placc-calendar__1938d_status_free .waves-ripple, .waves-green.__placc-calendar__1938d_status_reserved2_my .waves-ripple, .waves-green.__placc-calendar__1938d_status_reserved1 .waves-ripple {
     background-color: rgba(76, 175, 80, 0.7); }
-  .waves-effect.waves-teal .waves-ripple {
+  .waves-effect.waves-teal .waves-ripple, .waves-teal.__placc-calendar__1938d_status_free .waves-ripple, .waves-teal.__placc-calendar__1938d_status_reserved2_my .waves-ripple, .waves-teal.__placc-calendar__1938d_status_reserved1 .waves-ripple {
     background-color: rgba(0, 150, 136, 0.7); }
-  .waves-effect input[type="button"], .waves-effect input[type="reset"], .waves-effect input[type="submit"] {
+  .waves-effect input[type="button"], .__placc-calendar__1938d_status_free input[type="button"], .__placc-calendar__1938d_status_reserved2_my input[type="button"], .__placc-calendar__1938d_status_reserved1 input[type="button"], .waves-effect input[type="reset"], .__placc-calendar__1938d_status_free input[type="reset"], .__placc-calendar__1938d_status_reserved2_my input[type="reset"], .__placc-calendar__1938d_status_reserved1 input[type="reset"], .waves-effect input[type="submit"], .__placc-calendar__1938d_status_free input[type="submit"], .__placc-calendar__1938d_status_reserved2_my input[type="submit"], .__placc-calendar__1938d_status_reserved1 input[type="submit"] {
     border: 0;
     font-style: normal;
     font-size: inherit;
     text-transform: inherit;
     background: none; }
-  .waves-effect img {
+  .waves-effect img, .__placc-calendar__1938d_status_free img, .__placc-calendar__1938d_status_reserved2_my img, .__placc-calendar__1938d_status_reserved1 img {
     position: relative;
     z-index: -1; }
 
@@ -4080,7 +4092,7 @@ button.btn-floating {
   display: block; }
 
 /* Firefox Bug: link not triggered */
-.waves-effect .waves-ripple {
+.waves-effect .waves-ripple, .__placc-calendar__1938d_status_free .waves-ripple, .__placc-calendar__1938d_status_reserved2_my .waves-ripple, .__placc-calendar__1938d_status_reserved1 .waves-ripple {
   z-index: -1; }
 
 .modal {
@@ -4111,7 +4123,7 @@ button.btn-floating {
     padding: 4px 6px;
     height: 56px;
     width: 100%; }
-    .modal .modal-footer .btn, .modal .modal-footer .btn-large, .modal .modal-footer span.availability, .modal .modal-footer .accent-btn, .modal .modal-footer .inv-accent-btn, .modal .modal-footer .inv-btn, .modal .modal-footer .btn-flat {
+    .modal .modal-footer .btn, .modal .modal-footer .btn-large, .modal .modal-footer span.availability, .modal .modal-footer .accent-btn, .modal .modal-footer .inv-accent-btn, .modal .modal-footer .inv-btn, .modal .modal-footer .__placc-calendar__1938d_status_free, .modal .modal-footer .__placc-calendar__1938d_status_reserved2_my, .modal .modal-footer .__placc-calendar__1938d_status_reserved1, .modal .modal-footer .btn-flat {
       float: right;
       margin: 6px 0; }
 
@@ -5162,7 +5174,7 @@ select:disabled {
     padding-left: 10px; }
   .file-field input.file-path {
     width: 100%; }
-  .file-field .btn, .file-field .btn-large, .file-field span.availability, .file-field .accent-btn, .file-field .inv-accent-btn, .file-field .inv-btn {
+  .file-field .btn, .file-field .btn-large, .file-field span.availability, .file-field .accent-btn, .file-field .inv-accent-btn, .file-field .inv-btn, .file-field .__placc-calendar__1938d_status_free, .file-field .__placc-calendar__1938d_status_reserved2_my, .file-field .__placc-calendar__1938d_status_reserved1 {
     float: left;
     height: 3rem;
     line-height: 3rem; }
@@ -5368,13 +5380,13 @@ input[type=range]:focus::-ms-fill-upper {
     padding: 0 32px; }
     .side-nav a:hover {
       background-color: rgba(0, 0, 0, 0.05); }
-    .side-nav a.btn, .side-nav a.btn-large, .side-nav a.accent-btn, .side-nav a.inv-accent-btn, .side-nav a.inv-btn, .side-nav a.btn-large, .side-nav a.btn-flat, .side-nav a.btn-floating {
+    .side-nav a.btn, .side-nav a.btn-large, .side-nav a.accent-btn, .side-nav a.inv-accent-btn, .side-nav a.inv-btn, .side-nav a.__placc-calendar__1938d_status_free, .side-nav a.__placc-calendar__1938d_status_reserved2_my, .side-nav a.__placc-calendar__1938d_status_reserved1, .side-nav a.btn-large, .side-nav a.btn-flat, .side-nav a.btn-floating {
       margin: 10px 15px; }
-    .side-nav a.btn, .side-nav a.btn-large, .side-nav a.accent-btn, .side-nav a.inv-accent-btn, .side-nav a.inv-btn, .side-nav a.btn-large, .side-nav a.btn-floating {
+    .side-nav a.btn, .side-nav a.btn-large, .side-nav a.accent-btn, .side-nav a.inv-accent-btn, .side-nav a.inv-btn, .side-nav a.__placc-calendar__1938d_status_free, .side-nav a.__placc-calendar__1938d_status_reserved2_my, .side-nav a.__placc-calendar__1938d_status_reserved1, .side-nav a.btn-large, .side-nav a.btn-floating {
       color: #fff; }
     .side-nav a.btn-flat {
       color: #343434; }
-    .side-nav a.btn:hover, .side-nav a.btn-large:hover, .side-nav a.accent-btn:hover, .side-nav a.inv-accent-btn:hover, .side-nav a.inv-btn:hover, .side-nav a.btn-large:hover {
+    .side-nav a.btn:hover, .side-nav a.btn-large:hover, .side-nav a.accent-btn:hover, .side-nav a.inv-accent-btn:hover, .side-nav a.inv-btn:hover, .side-nav a.__placc-calendar__1938d_status_free:hover, .side-nav a.__placc-calendar__1938d_status_reserved2_my:hover, .side-nav a.__placc-calendar__1938d_status_reserved1:hover, .side-nav a.btn-large:hover {
       background-color: #7dc0d2; }
     .side-nav a.btn-floating:hover {
       background-color: #6ab7cb; }
@@ -6619,7 +6631,7 @@ button.picker__today:focus, button.picker__clear:focus, button.picker__close:foc
   .picker--time .picker__box {
     margin-bottom: 5em; } }
 
-.z-depth-1, nav, .card-panel, .card, .toast, .btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn, .btn-floating, .dropdown-content, .collapsible, .side-nav, .q-link.collection, .inv-accent-btn:hover {
+.z-depth-1, nav, .card-panel, .card, .toast, .btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn, .__placc-calendar__1938d_status_free, .__placc-calendar__1938d_status_reserved2_my, .__placc-calendar__1938d_status_reserved1, .btn-floating, .dropdown-content, .collapsible, .side-nav, .q-link.collection, .inv-accent-btn:hover {
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.12);
   /*
 	box-shadow:none;
@@ -6979,7 +6991,7 @@ div.profileimgmob {
   background-color: white;
   color: #2196F3 !important; }
 
-.btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn, .accent-btn, .vote {
+.btn, .btn-large, span.availability, .accent-btn, .inv-accent-btn, .inv-btn, .__placc-calendar__1938d_status_free, .__placc-calendar__1938d_status_reserved2_my, .__placc-calendar__1938d_status_reserved1, .accent-btn, .vote {
   border-radius: 25px; }
 
 .spinner {
@@ -7164,5 +7176,140 @@ ul.share-buttons img {
 
 .tooltip:hover .tooltiptext {
   display: block; }
+
+/********** POD styles ***************/
+.__placc-calendar__1938d {
+  position: absolute;
+  top: 80px;
+  left: 100px;
+  z-index: 10000; }
+
+.__placc-calendar__1938d_header {
+  width: 100%;
+  display: block;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  line-height: 2em;
+  height: 2em; }
+  .__placc-calendar__1938d_header p {
+    display: inline-block;
+    margin: 0 10px;
+    font-size: 1.5em;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: default; }
+  .__placc-calendar__1938d_header i {
+    font-size: 2em;
+    float: right;
+    display: block;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: pointer; }
+
+.__placc-calendar__1938d_calendar {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%; }
+
+.__placc-calendar__1938d_day_0, .__placc-calendar__1938d_day_1, .__placc-calendar__1938d_day_2, .__placc-calendar__1938d_day_3, .__placc-calendar__1938d_day_4, .__placc-calendar__1938d_day_5, .__placc-calendar__1938d_day_6 {
+  width: 6em;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  height: auto;
+  flex-grow: 1; }
+
+.__placc-calendar__1938d_day_0, .__placc-calendar__1938d_day_6 {
+  background-color: #ededed;
+  cursor: default; }
+
+.__placc-calendar__1938d_week {
+  cursor: default;
+  position: relative;
+  top: -10px;
+  margin: 0px;
+  padding: 0px 5px;
+  text-transform: uppercase; }
+
+.__placc-calendar__1938d_date {
+  cursor: default;
+  padding: 0px 0.5em;
+  margin: 0px;
+  color: #F5403A;
+  font-size: 3em;
+  font-style: bold; }
+
+.__placc-calendar__1938d_month {
+  cursor: default;
+  margin: 0px;
+  padding: 0.3em 0em;
+  font-size: 0.8em;
+  border-bottom: 1px solid #e0e0e0; }
+
+.__placc-calendar__1938d_status_free, .__placc-calendar__1938d_status_reserved2_my, .__placc-calendar__1938d_status_reserved1 {
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  border-radius: 2px;
+  margin-bottom: 0.5em;
+  padding: 0 0.8em;
+  height: auto;
+  font-size: 0.8em;
+  background-color: #00B286;
+  width: 6.6em; }
+
+.__placc-calendar__1938d_status_reserved2_my {
+  background-color: #FF5722; }
+
+.__placc-calendar__1938d_status_reserved2_my:hover {
+  background-color: #ee3900; }
+
+.__placc-calendar__1938d_status_free:hover {
+  background-color: #007f60; }
+
+.__placc-calendar__1938d_status_reserved1 {
+  background-color: #BBC007; }
+
+.__placc-calendar__1938d_status_reserved1:hover {
+  background-color: #8b8f05; }
+
+.__placc-calendar__1938d_status_reserved2 {
+  width: 6.6em;
+  border: none;
+  border-radius: 2px;
+  display: inline-block;
+  line-height: 36px;
+  padding: 0 0.8em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  border-radius: 2px;
+  margin-bottom: 0.5em;
+  height: auto;
+  font-size: 0.8em;
+  background-color: #ededed;
+  border: 1px solid #e0e0e0;
+  color: rgba(0, 0, 0, 0.87); }
+
+.__placc-calendar__1938d_prev, .__placc-calendar__1938d_next {
+  cursor: default;
+  align-self: stretch;
+  vertical-align: top;
+  border: 1px solid #e0e0e0;
+  width: 3em;
+  background-color: #c8c8c8;
+  color: white;
+  transition: .2s ease-out; }
+  .__placc-calendar__1938d_prev i, .__placc-calendar__1938d_next i {
+    font-size: 3em;
+    padding: 0px;
+    margin: 0px; }
+
+.__placc-calendar__1938d_prev:hover, .__placc-calendar__1938d_next:hover {
+  background-color: #afafaf; }
 
 /*# sourceMappingURL=client.css.map */

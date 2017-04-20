@@ -58,6 +58,8 @@
 		r.seat as rseat,
 		r.useracc as ruseracc,
 		r.create_dt as rcreate_dt,
+		r.target_date as rtarget_date,
+		r.status as rstatus,
 		s.name as sname,
 		s.id as sid,
 		l.name as lname,
@@ -68,6 +70,10 @@
 	<resultMap id="ReservationResult" type="Reservation" autoMapping="true">
 		<result column="rid" property="id" />
 		<result column="rcreate_dt" property="createDt" />
+		<result column="rtarget_date" property="targetDate" />
+		<result column="rstatus" property="status" />
+		<result column="ruseracc" property="userId" />
+		
 		<association column="ruseracc" property="useracc" javaType="Useracc">
 			<id property="id" column="ruseracc"/>
 		</association>	
@@ -170,6 +176,13 @@
 		]]>
 	</select>
 	
+	<select id="findOneReservation" resultMap="ReservationResult">
+		<include refid="reservationSql"></include>
+		<![CDATA[
+		and r.id=#{sid}
+		]]>
+	</select>
+	
 	<insert id="insertCompany" useGeneratedKeys="true" keyProperty="id"
 		keyColumn="id" parameterType="Company">
 		INSERT INTO company (
@@ -205,12 +218,14 @@
 		seat,
 		useracc,
 		status,
+		target_date,
 		create_dt
 		)
 		values (
 		#{seat.id},
 		#{useracc.id},
 		1,
+		#{targetDate},
 		#{createDt}
 		)
 	</insert>	
@@ -220,4 +235,7 @@
 		create_dt = #{createDt},
 		where seat= #{seat.id} and useracc = #{useracc.id} 
 	</update>	
+	<delete id="deleteReservation" parameterType="Reservation">
+	delete from reservation where id=#{id}
+	</delete>
 </mapper>
