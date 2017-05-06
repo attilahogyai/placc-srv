@@ -12,6 +12,10 @@ public class Seat extends AbstractEntity {
 	private Integer capacity;
 	private String name;
 	private String img;
+	private Integer code;
+	private Integer reservationCount;
+	private Integer myReservationCount;
+
 	public Seat(){
 		
 	}
@@ -41,5 +45,23 @@ public class Seat extends AbstractEntity {
 	}
 	public void setImg(String img) {
 		this.img = img;
+	}	
+	public Integer getReservationCount() {
+		return reservationCount;
+	}
+	public void setReservationCount(Integer reservationCount) {
+		this.reservationCount = reservationCount;
+	}
+	public Integer getCode() {
+		return code;
+	}
+	public void setCode(Integer code) {
+		this.code = code;
+	}
+	public Integer getMyReservationCount() {
+		return myReservationCount;
+	}
+	public void setMyReservationCount(Integer myReservationCount) {
+		this.myReservationCount = myReservationCount;
 	}
 }

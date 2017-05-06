@@ -19,6 +19,7 @@ import com.myplacc.domain.company.Seat;
 import com.myplacc.domain.reservation.Reservation;
 import com.myplacc.domain.user.Useracc;
 import com.myplacc.service.impl.PlaccDaoMapper;
+import com.myplacc.web.exception.BadRequest;
 
 @RequestMapping("/api")
 @Controller
@@ -36,7 +37,11 @@ public class ReservationController extends AbstractController{
 		Reservation r=new Reservation();
 		r.setSeat(new Seat(seatId));
 		r.setTargetDate(new Timestamp(date.getTime()));
-		r.setCreateDt(new Timestamp(new Date().getTime()));
+		long now=new Date().getTime();
+		if(now>r.getTargetDate().getTime()){
+			throw new BadRequest("RESERVATION_BACK_IN_TIME");
+		}
+		r.setCreateDt(new Timestamp(now));
 		r.setUseracc(user);
 		placcDaoMapper.prepareReservation(r);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

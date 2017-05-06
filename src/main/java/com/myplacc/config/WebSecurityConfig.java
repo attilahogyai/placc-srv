@@ -71,7 +71,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 				.antMatchers("/").permitAll()	
 				.antMatchers("/profile/index").permitAll()	
-				.antMatchers("/activate/**/*").permitAll()	
+				.antMatchers("/activate/**").permitAll()	
+				.antMatchers("/building/*").permitAll()	
+				.antMatchers("/level/*").permitAll()	
 				
 				.antMatchers("/index.html").permitAll()
 				.antMatchers("/crossdomain.xml").permitAll()

@@ -29,7 +29,7 @@ public class CompanyDaoTest extends AbstractTest {
 	public void findAll() throws Exception {
 		PlaccDaoMapper mapper=(PlaccDaoMapper)getMapper(PlaccDaoMapper.class);
 		List<Company> items = mapper.findAllCompany();
-		assertTrue(items.size() > 1);
+		assertTrue(items.size() > 0);
 		assertNotNull(items);
 	}
 
@@ -43,7 +43,7 @@ public class CompanyDaoTest extends AbstractTest {
 		assertEquals("Dorsum Zrt.", c.getName());
 		assertNotNull(c.getImg());
 		
-		assertEquals(2, c.getBuilding().size());
+		assertTrue(c.getBuilding().size()>0);
 		
 		// Building test
 		Building b = mapper.findOneBuilding(Long.valueOf(1));
@@ -51,13 +51,17 @@ public class CompanyDaoTest extends AbstractTest {
 		assertNotNull(b.getLevel());
 		assertNotNull(b.getCity());
 		assertNotNull(b.getAddress());
+		assertNotNull(b.getCompany().getName());
+		assertNotNull(b.getCompany().getImg());
 		
 		
 		// Level test
-		Level l = mapper.findOneLevel(Long.valueOf(4));
+		Level l = mapper.findOneLevel(Long.valueOf(4),0L);
 		assertNotNull(l.getName());
 		assertNotNull(l.getSeat());
 		assertNotNull(l.getSeat().get(0).getName());
+		assertNotNull(l.getSeat().get(0).getReservationCount());
+		assertNotNull(l.getSeat().get(0).getCode());
 		assertNotNull(l.getStatus());
 		
 	}

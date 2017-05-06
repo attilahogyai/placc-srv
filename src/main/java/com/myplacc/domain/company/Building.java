@@ -18,12 +18,13 @@ public class Building extends AbstractEntity {
 	private String img;
 	private String address;
 	private String city;
-	
+	@JsonApiIncludeByDefault
     @JsonApiToOne
 	private Company company;
 	@JsonApiIncludeByDefault
 	@JsonApiToMany
 	private List<Level> level;
+	private Integer status;
 	
 	public Company getCompany() {
 		return company;
@@ -60,5 +61,11 @@ public class Building extends AbstractEntity {
 	}
 	public void setCity(String city) {
 		this.city = city;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 }

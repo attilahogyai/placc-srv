@@ -25,6 +25,11 @@
 		<result column="bimg" property="img" />
 		<result column="baddress" property="address" />
 		<result column="bcity" property="city" />
+		<association property="company" javaType="Company">
+			<id property="id" column="cid" />
+			<result property="img" column="cimg"/>
+			<result property="name" column="cname"/>			
+		</association>			
 		<collection property="level" ofType="Level" notNullColumn="lid">
 			<id property="id" column="lid"/>
 			<result property="name" column="lname"/>
@@ -41,11 +46,14 @@
 		<result column="lid" property="id" />
 		<result column="lname" property="name" />
 		<result column="limg" property="img" />
-		<result property="status" column="lstatus"/>		
+		<result column="lstatus" property="status" />	
 		<collection property="seat" ofType="Seat" notNullColumn="sid">
 			<id property="id" column="sid"/>
 			<result property="name" column="sname"/>
 			<result property="img" column="simg"/>
+			<result property="code" column="scode"/>			
+			<result property="reservationCount" column="rcount" />	
+			<result property="myReservationCount" column="myReservationCount" />	
 			<association property="level" javaType="Level">
 				<id property="id" column="lid" />
 			</association>		
@@ -54,6 +62,7 @@
 	
 	
 	<sql id="reservationSql">
+	<![CDATA[
 	select r.id as rid,
 		r.seat as rseat,
 		r.useracc as ruseracc,
@@ -62,10 +71,14 @@
 		r.status as rstatus,
 		s.name as sname,
 		s.id as sid,
+		s.code as scode,
+		(select count(1) from reservation where seat=s.id and target_date>current_date and target_date<(current_date+7) and useracc=#{userId}) as myReservationCount,		
+		(select count(1) from reservation where seat=s.id and target_date>current_date and target_date<(current_date+7)) as srcount,
 		l.name as lname,
 		l.id as lid
 	 from reservation r, seat s, level l
 	 where r.seat=s.id and s.level=l.id
+	 ]]>
 	</sql>	
 	<resultMap id="ReservationResult" type="Reservation" autoMapping="true">
 		<result column="rid" property="id" />
@@ -73,19 +86,21 @@
 		<result column="rtarget_date" property="targetDate" />
 		<result column="rstatus" property="status" />
 		<result column="ruseracc" property="userId" />
-		
 		<association column="ruseracc" property="useracc" javaType="Useracc">
 			<id property="id" column="ruseracc"/>
 		</association>	
 		<association column="sid" property="seat" javaType="Seat">
 			<id property="id" column="sid"/>
 			<result property="name" column="sname"/>
+			<result property="code" column="scode"/>			
+			<result property="reservationCount" column="srcount"/>
+			<result property="myReservationCount" column="myReservationCount"/>
+			
 			<association column="lid" property="level" javaType="Level">
 				<id property="id" column="lid"/>
 				<result property="name" column="lname"/>
 			</association>			
 		</association>		
-
 	</resultMap>	
 	
 	
@@ -100,7 +115,7 @@
 		b.address as baddress,
 		b.name as bname
 	 from company as c left join building b on c.id=b.company
-	 where 1=1
+	 where c.status=1 and b.status=1
 	</sql>
 	
 	<sql id="buildingSql">
@@ -109,15 +124,19 @@
 		b.img as bimg,
 		b.city as bcity,
 		b.address as baddress,
+		c.id as cid,
+		c.name as cname,
+		c.img as cimg,
 		l.img as limg,
 		l.id as lid,
 		l.name as lname
 	 from building as b join level l on b.id=l.building
 	 join company c on b.company = c.id
-	 where l.status=1
+	 where b.status=1 and l.status=1
 	</sql>	
 
 	<sql id="levelSql">
+	<![CDATA[
 	select b.id as bid,
 		b.name as bname,
 		b.img as bimg,
@@ -132,10 +151,14 @@
 		s.id as sid,
 		s.name as sname,
 		s.capacity,
-		s.img
+		s.img,
+		s.code as scode,
+		(select count(1) from reservation where seat=s.id and target_date>current_date and target_date<(current_date+7) and useracc=#{userId}) as myReservationCount,
+		(select count(1) from reservation where seat=s.id and target_date>current_date and target_date<(current_date+7)) as rcount
 	 from level as l join seat s on l.id=s.level
 	 join building as b on l.building=b.id
 	 where l.status=1
+	 ]]>
 	</sql>	
 
 	
@@ -159,7 +182,7 @@
 	<select id="findOneLevel" resultMap="levelResult">
 		<include refid="levelSql"></include>
 		<![CDATA[
-		and l.id=#{bid}
+		and l.id=#{levelId}
 		]]>
 	</select>
 
@@ -172,7 +195,13 @@
 	<select id="listReservationsForSeat" resultMap="ReservationResult">
 		<include refid="reservationSql"></include>
 		<![CDATA[
-		and s.id=#{sid}
+		and s.id=#{seatId}
+		]]>
+	</select>
+	<select id="listReservationsForUser" resultMap="ReservationResult">
+		<include refid="reservationSql"></include>
+		<![CDATA[
+		and r.useracc=#{user}
 		]]>
 	</select>
 	

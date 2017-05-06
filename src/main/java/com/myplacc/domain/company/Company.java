@@ -13,6 +13,7 @@ import io.katharsis.resource.annotations.JsonApiToMany;
 public class Company extends AbstractEntity {
 	private String name;
 	private String img;
+	private Integer status;
 	@JsonApiIncludeByDefault
 	@JsonApiToMany
 	private List<Building> building;
@@ -42,6 +43,12 @@ public class Company extends AbstractEntity {
 	}
 	public void setCreatedt(Timestamp createdt) {
 		this.createdt = createdt;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 	
 	

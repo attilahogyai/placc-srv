@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*
 @font-face {
   font-family: 'Open Sans';
@@ -7177,6 +7178,9 @@ ul.share-buttons img {
 .tooltip:hover .tooltiptext {
   display: block; }
 
+body {
+  background-image: url("/assets/images/bg.jpg"); }
+
 /********** POD styles ***************/
 .__placc-calendar__1938d {
   position: absolute;
@@ -7217,9 +7221,20 @@ ul.share-buttons img {
 .__placc-calendar__1938d_day_0, .__placc-calendar__1938d_day_1, .__placc-calendar__1938d_day_2, .__placc-calendar__1938d_day_3, .__placc-calendar__1938d_day_4, .__placc-calendar__1938d_day_5, .__placc-calendar__1938d_day_6 {
   width: 6em;
   background-color: white;
-  border: 1px solid #e0e0e0;
+  border-left: 1px solid #e0e0e0;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: none;
   height: auto;
   flex-grow: 1; }
+
+.__placc-calendar__1938d .today {
+  background: cornsilk;
+  border: 1px solid  #e0e0e0;
+  border-right: none; }
+
+.__placc-calendar__1938d .placc-date-inactive .placc-date, .__placc-calendar__1938d .placc-date-inactive .placc-week, .__placc-calendar__1938d .placc-date-inactive .placc-month {
+  color: rgba(0, 0, 0, 0.87); }
 
 .__placc-calendar__1938d_day_0, .__placc-calendar__1938d_day_6 {
   background-color: #ededed;
@@ -7237,7 +7252,7 @@ ul.share-buttons img {
   cursor: default;
   padding: 0px 0.5em;
   margin: 0px;
-  color: #F5403A;
+  color: #FF5722;
   font-size: 3em;
   font-style: bold; }
 
@@ -7258,7 +7273,7 @@ ul.share-buttons img {
   height: auto;
   font-size: 0.8em;
   background-color: #00B286;
-  width: 6.6em; }
+  width: 9em; }
 
 .__placc-calendar__1938d_status_reserved2_my {
   background-color: #FF5722; }
@@ -7309,7 +7324,53 @@ ul.share-buttons img {
     padding: 0px;
     margin: 0px; }
 
+.__placc-calendar__1938d_prev.inactive:hover, .__placc-calendar__1938d_next.inactive:hover {
+  background-color: #c8c8c8; }
+
 .__placc-calendar__1938d_prev:hover, .__placc-calendar__1938d_next:hover {
   background-color: #afafaf; }
+
+/*** SVG ***/
+svg {
+  background: white; }
+
+.toc-wrapper {
+  display: none !important; }
+
+.g2_1 {
+  fill: rgba(0, 0, 0, 0.15) !important; }
+
+.g2_1.table {
+  fill: rgba(0, 0, 0, 0.15); }
+
+.g2_1.table:after {
+  content: 'Hetfő'; }
+
+.rc_0 {
+  fill: #00E676 !important; }
+
+.rc_1 {
+  fill: #69F0AE !important; }
+
+.rc_2 {
+  fill: #F4FF81 !important; }
+
+.rc_3 {
+  fill: #EEFF41 !important; }
+
+.rc_4 {
+  fill: #FF9800 !important; }
+
+.rc_5 {
+  fill: #E53935 !important; }
+
+.g3_1 {
+  fill: none;
+  stroke: #9b9b9b;
+  stroke-width: 0.5;
+  stroke-linecap: round;
+  stroke-linejoin: round; }
+
+/*** end SVG **/
 
 /*# sourceMappingURL=client.css.map */

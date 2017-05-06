@@ -391,7 +391,7 @@ public class LoginController extends AbstractController{
 				+ Long.toString(RandomHelper.getRandomLong(1000000)));
 		
 		userManager.newUserInit(ua);
-		/*
+		
 		try {
 			Map arguments = new HashMap();
 			arguments.put("addressee", ua);
@@ -410,7 +410,7 @@ public class LoginController extends AbstractController{
 			log.error("send mail error:", e);
 			throw e;
 		}
-		*/
+
 		ua.setSensible(true);
 		
 		Session session=RequestWrapper.getSession();

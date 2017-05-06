@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.myplacc.domain.company.Level;
+import com.myplacc.domain.user.Session;
+import com.myplacc.web.controller.RequestWrapper;
 
 import io.katharsis.queryParams.QueryParams;
 import io.katharsis.repository.ResourceRepository;
@@ -32,7 +34,12 @@ public class LevelServiceImpl extends AbstractService implements ResourceReposit
 
 	@Override
 	public Level findOne(Long id, QueryParams arg1) {
-		return placcDaoMapper.findOneLevel(id);
+		Session session=RequestWrapper.getSession();
+		Long userid=0L;
+		if(session.getUseracc()!=null){
+			userid=(Long)session.getUseracc().getId();
+		}
+		return placcDaoMapper.findOneLevel(id,userid);
 	}
 
 	@Override

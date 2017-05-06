@@ -275,6 +275,15 @@ define('client/tests/helpers/starts-with.jshint.lint-test', ['exports'], functio
     assert.ok(true, 'helpers/starts-with.js should pass jshint.');
   });
 });
+define('client/tests/helpers/str-concat.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | helpers/str-concat.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'helpers/str-concat.js should pass jshint.');
+  });
+});
 define('client/tests/helpers/to-ascii.jshint.lint-test', ['exports'], function (exports) {
   'use strict';
 
@@ -670,6 +679,15 @@ define('client/tests/pods/components/header-profile-box/component.jshint.lint-te
     assert.ok(true, 'pods/components/header-profile-box/component.js should pass jshint.');
   });
 });
+define('client/tests/pods/components/help-box/component.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | pods/components/help-box/component.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'pods/components/help-box/component.js should pass jshint.');
+  });
+});
 define('client/tests/pods/components/info-modal/component.jshint.lint-test', ['exports'], function (exports) {
   'use strict';
 
@@ -686,15 +704,6 @@ define('client/tests/pods/components/placc-calendar/component.jshint.lint-test',
   QUnit.test('should pass jshint', function (assert) {
     assert.expect(1);
     assert.ok(true, 'pods/components/placc-calendar/component.js should pass jshint.');
-  });
-});
-define('client/tests/pods/components/post-question/component.jshint.lint-test', ['exports'], function (exports) {
-  'use strict';
-
-  QUnit.module('JSHint | pods/components/post-question/component.js');
-  QUnit.test('should pass jshint', function (assert) {
-    assert.expect(1);
-    assert.ok(true, 'pods/components/post-question/component.js should pass jshint.');
   });
 });
 define('client/tests/pods/components/profile-card/component.jshint.lint-test', ['exports'], function (exports) {
@@ -742,6 +751,15 @@ define('client/tests/pods/cpolicy/route.jshint.lint-test', ['exports'], function
     assert.ok(true, 'pods/cpolicy/route.js should pass jshint.');
   });
 });
+define('client/tests/pods/error-page/route.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | pods/error-page/route.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'pods/error-page/route.js should pass jshint.');
+  });
+});
 define('client/tests/pods/index/controller.jshint.lint-test', ['exports'], function (exports) {
   'use strict';
 
@@ -766,7 +784,7 @@ define('client/tests/pods/level/controller.jshint.lint-test', ['exports'], funct
   QUnit.module('JSHint | pods/level/controller.js');
   QUnit.test('should pass jshint', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'pods/level/controller.js should pass jshint.\npods/level/controller.js: line 38, col 15, Missing semicolon.\n\n1 error');
+    assert.ok(true, 'pods/level/controller.js should pass jshint.');
   });
 });
 define('client/tests/pods/level/route.jshint.lint-test', ['exports'], function (exports) {
@@ -838,7 +856,7 @@ define('client/tests/pods/profile/index/controller.jshint.lint-test', ['exports'
   QUnit.module('JSHint | pods/profile/index/controller.js');
   QUnit.test('should pass jshint', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'pods/profile/index/controller.js should pass jshint.');
+    assert.ok(false, 'pods/profile/index/controller.js should pass jshint.\npods/profile/index/controller.js: line 10, col 73, Missing semicolon.\npods/profile/index/controller.js: line 14, col 11, Missing semicolon.\n\n2 errors');
   });
 });
 define('client/tests/pods/profile/index/route.jshint.lint-test', ['exports'], function (exports) {
@@ -1417,6 +1435,27 @@ define('client/tests/unit/pods/cpolicy/route-test.jshint.lint-test', ['exports']
     assert.ok(true, 'unit/pods/cpolicy/route-test.js should pass jshint.');
   });
 });
+define('client/tests/unit/pods/error-page/route-test', ['exports', 'ember-qunit'], function (exports, _emberQunit) {
+
+  (0, _emberQunit.moduleFor)('route:error-page', 'Unit | Route | error page', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var route = this.subject();
+    assert.ok(route);
+  });
+});
+define('client/tests/unit/pods/error-page/route-test.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | unit/pods/error-page/route-test.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/pods/error-page/route-test.js should pass jshint.');
+  });
+});
 define('client/tests/unit/pods/level/route-test', ['exports', 'ember-qunit'], function (exports, _emberQunit) {
 
   (0, _emberQunit.moduleFor)('route:level', 'Unit | Route | level', {
@@ -1677,6 +1716,15 @@ define('client/tests/unit/validators/unique-email-test.jshint.lint-test', ['expo
   QUnit.test('should pass jshint', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/validators/unique-email-test.js should pass jshint.');
+  });
+});
+define('client/tests/utils/auth-route.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | utils/auth-route.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'utils/auth-route.js should pass jshint.');
   });
 });
 define('client/tests/utils/i18n/missing-message.jshint.lint-test', ['exports'], function (exports) {

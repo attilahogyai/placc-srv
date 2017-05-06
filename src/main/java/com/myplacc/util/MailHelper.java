@@ -92,7 +92,7 @@ public class MailHelper {
 
 	
 	
-	public static final String INFO_MAIL_ADDRESS="info@xprtroom.com";
+	public static final String INFO_MAIL_ADDRESS="info@myplacc.hu";
 	public static final String INFO_MAIL_NAME="MyFotoRoom";
 	
 	
@@ -302,10 +302,10 @@ public class MailHelper {
 		}
 		if(System.getProperty("smtp.ssl")!=null && System.getProperty("smtp.ssl").equals("true")){
 			props.setProperty("mail.smtp.class", "com.sun.mail.smtp.SMTPSSLTransport");
-			props.setProperty("mail.smtp.port", "465");
-			props.setProperty("mail.smtp.socketFactory.port", "465");
+			props.setProperty("mail.smtp.port", "26");
+			props.setProperty("mail.smtp.socketFactory.port", "26");
 			props.setProperty("mail.gm.class", "com.sun.mail.smtp.SMTPSSLTransport");
-			props.setProperty("mail.gm.port", "465");
+			props.setProperty("mail.gm.port", "26");
 		}else{
 			props.setProperty("mail.smtp.class", "com.sun.mail.smtp.SMTPTransport");
 			props.setProperty("mail.smtp.port", "25");

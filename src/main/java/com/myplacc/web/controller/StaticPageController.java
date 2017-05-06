@@ -14,4 +14,8 @@ public class StaticPageController {
 	public String activate() throws Exception{
 		return "forward:/";
 	}	
+	@RequestMapping(value="/level/*",method=RequestMethod.GET)
+	public String level() throws Exception{
+		return "forward:/";
+	}		
 }

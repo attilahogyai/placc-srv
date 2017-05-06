@@ -53,4 +53,5 @@ public class Level extends AbstractEntity {
 		this.status = status;
 	}
 
+
 }

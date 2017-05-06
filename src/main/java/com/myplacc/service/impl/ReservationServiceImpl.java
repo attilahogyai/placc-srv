@@ -40,7 +40,12 @@ public class ReservationServiceImpl extends AbstractService implements  Resource
 	public Iterable<Reservation> findAll(QueryParams query) {
 		Set<String> r=query.getFilters().getParams().get("seat").getParams().get("");
 		if(r==null || r.size()==0) return null;
-		return placcDaoMapper.listReservationsForSeat(Long.parseLong(r.toArray(new String[r.size()])[0]));
+		Session session=RequestWrapper.getSession();
+		Long userid=0L;
+		if(session.getUseracc()!=null){
+			userid=(Long)session.getUseracc().getId();
+		}		
+		return placcDaoMapper.listReservationsForSeat(Long.parseLong(r.toArray(new String[r.size()])[0]),userid);
 	}
 
 	@Override
