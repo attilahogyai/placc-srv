@@ -24,10 +24,10 @@ window.xappc.initSvg=function(data){
         if (xhr.readyState != 4) return;
         var svg = xhr.responseXML.documentElement;
         svg = document.importNode(svg, true); 
-		$('.section img').remove();
-        $('.section').append(svg);
-		$('svg').addClass('z-depth-2');
-		
+        $('.myplaccsvg').append(svg);
+        var svg=$('svg');
+        svg.attr("width", "auto");
+        svg.attr("height", "auto");		
         var svgPanZoom = $("svg").svgPanZoom();
 				
 		$('.g2_1').click(function (event) {
@@ -36,8 +36,8 @@ window.xappc.initSvg=function(data){
 
 			if (match != undefined && match != null){
 				if ($(event.target).attr('data-reservationCount') < 5 || $(event.target).attr('data-reservationCount') == undefined){
-					var func=xappc.appInstance.__container__.lookup('controller:level').get('actions.setReservation');
-					func.apply(xappc.appInstance.__container__.lookup('controller:level'), [match[1]] )
+					var func=xappc.appInstance.__container__.lookup('controller:company.level').get('actions.setReservation');
+					func.apply(xappc.appInstance.__container__.lookup('controller:company.level'), [match[1]] )
 				}
 			}
         });

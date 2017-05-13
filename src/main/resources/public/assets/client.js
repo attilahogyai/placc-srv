@@ -1657,6 +1657,131 @@ define('client/pods/building/route', ['exports', 'ember'], function (exports, _e
 define("client/pods/building/template", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template({ "id": "P9W2fSUj", "block": "{\"statements\":[[\"block\",[\"page-view\"],null,[[\"scrollToTop\"],[true]],3],[\"text\",\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\"],[\"open-element\",\"a\",[]],[\"static-attr\",\"href\",\"#\"],[\"static-attr\",\"class\",\"waves-effect waves-light btn accent-btn white-text\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"button.how_to_use\"],null],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"button.open\"],null],false]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"ember-view card question-card\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-image\"],[\"dynamic-attr\",\"style\",[\"concat\",[\"background-image:url('\",[\"helper\",[\"if\"],[[\"get\",[\"level\",\"img\"]],[\"get\",[\"level\",\"img\"]],\"/assets/images/building/level.JPG\"],null],\"');\"]]],[\"flush-element\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"span\",[]],[\"static-attr\",\"class\",\"card-title question-title\"],[\"static-attr\",\"style\",\"display: block;padding:16px 24px\"],[\"flush-element\"],[\"append\",[\"unknown\",[\"level\",\"name\"]],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-action\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"block\",[\"link-to\"],[\"level\",[\"get\",[\"level\",\"id\"]]],null,1],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[\"level\"]},{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"static-attr\",\"id\",\"index-banner\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m7\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"blockquote\",[]],[\"static-attr\",\"style\",\"background-color:white\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"img\",[]],[\"dynamic-attr\",\"src\",[\"concat\",[[\"unknown\",[\"model\",\"company\",\"img\"]]]]],[\"flush-element\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"comment\",\"h4>{{model.company.name}}</h4\"],[\"text\",\"\\t\\t\\t\\n\\t\\t\\t\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"append\",[\"unknown\",[\"model\",\"address\"]],false],[\"text\",\", \"],[\"append\",[\"unknown\",[\"model\",\"city\"]],false],[\"close-element\"],[\"text\",\"\\n    \\t\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"block\",[\"each\"],[[\"get\",[\"model\",\"level\"]]],null,2],[\"text\",\"\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m5\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"toc-wrapper\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"help-box\"],null,[[\"helpTextCode\",\"showYield\"],[\"help.building\",false]],0],[\"text\",\"\\t\\t\\t\\t\\t          \\t\"],[\"text\",\"\\n\"],[\"text\",\"\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/building/template.hbs" } });
 });
+define('client/pods/company/level/controller', ['exports', 'ember'], function (exports, _ember) {
+	exports['default'] = _ember['default'].Controller.extend({
+		seatId: null,
+		modal: _ember['default'].inject.service(),
+		i18n: _ember['default'].inject.service(),
+		session: _ember['default'].inject.service(),
+		userId: _ember['default'].computed.readOnly('session.userid'),
+		isLoggedIn: _ember['default'].computed.readOnly('session.isLoggedIn'),
+		reservations: null,
+		calendarOpen: false,
+		showSVG: true,
+
+		actions: {
+
+			setReservation: function setReservation(seatId, code) {
+				var _this = this;
+
+				if (code) {
+					var m = this.get('model').get('seat.content.currentState');
+					for (var i = 0; i < m.get('length'); i++) {
+						var f = m[i]._record;
+						if (f.get('code') == code) {
+							seatId = f.get('id');
+							break;
+						}
+					}
+				}
+				if (!this.get('isLoggedIn')) {
+					this.get('modal').openInfoModal({ header: this.get('i18n').t('login.login_required'), text: this.get('i18n').t('login.login_required_for_reservation') });
+				} else {
+					this.get('store').query('reservation', { filters: { seat: seatId } }).then(function (data) {
+						_this.set('seatId', seatId);
+						_this.set('reservations', data);
+						_this.set('calendarOpen', true);
+					});
+					// call reservation update
+				}
+			},
+			onRelease: function onRelease(reservationId) {
+				var _this2 = this;
+
+				var reservation = this.get('reservations').find(function (element) {
+					return element.get('id') === reservationId;
+				});
+				if (!reservation) {
+					_ember['default'].Logger.debug('something went wrong reservation not found for ID:' + reservationId);
+					return false;
+				}
+				reservation.deleteRecord();
+				var s = reservation.save();
+				this.get('loader').startLoadProcess(s);
+				var c = this;
+				s.then(function () {
+					_this2.get('store').query('reservation', { filters: { seat: _this2.get('seatId') } }).then(function (data) {
+						_this2.set('reservations', data);
+						window.xappc.refreshSvg(_this2.get('model'));
+					})['catch'](function () {});
+				})['catch'](function (status) {
+					c.get('modal').openInfoModal({ header: c.get('i18n').t('reservation.error-header'), text: c.get('i18n').t('reservation.error-delete.' + status.responseText, status.text) });
+				});
+			},
+			onReserve: function onReserve(day) {
+				var _this3 = this;
+
+				var sid = this.get('seatId');
+				var ds = day.format('YYYY-MM-DD HH:mm:ss.SSSZZ');
+				_ember['default'].Logger.info('set reservation for sid:' + sid);
+				var reserv = window.xappc.getData('/api/prepareReservation', true, 'POST', true, false, {
+					sid: sid,
+					date: ds
+				}, null, null);
+				this.get('loader').startLoadProcess(reserv);
+				var c = this;
+				reserv.then(function (reservation) {
+					_this3.get('store').query('reservation', { filters: { seat: _this3.get('seatId') } }).then(function (data) {
+						_this3.set('reservations', data);
+						window.xappc.refreshSvg(_this3.get('model'));
+					})['catch'](function () {});
+				}, function (status) {
+					_this3.set('calendarOpen', false);
+					//if(status.responseText){
+					//    c.get('modal').openInfoModal({header:c.get('i18n').t('reservation.error-header'),text:c.get('i18n').t('reservation.error-text.'+status.responseText,status.text)});									
+					//}else{
+					c.get('modal').openInfoModal({ header: c.get('i18n').t('reservation.error-header'), text: c.get('i18n').t('reservation.error-text', status.text) });
+					//}
+				});
+			},
+			onCloseCalendar: function onCloseCalendar() {
+				this.set('calendarOpen', false);
+			}
+		}
+	});
+});
+define('client/pods/company/level/route', ['exports', 'ember', 'client/utils/auth-route'], function (exports, _ember, _clientUtilsAuthRoute) {
+	exports['default'] = _clientUtilsAuthRoute['default'].extend({
+
+		i18n: _ember['default'].inject.service(),
+		model: function model(params) {
+			return this.get('store').findRecord('level', params.level_id, { reload: true });
+		},
+		setupController: function setupController(controller, model) {
+			/*
+   Ember.Instrumentation.subscribe("signalr.setReservation", {
+   before: function(name, timestamp, payload) {
+   console.log('Recieved ', name, ' at ' + timestamp + ' with payload: ', payload);
+   controller.send('setReservation', payload);
+   },
+   after: function() {}
+   });
+   Ember.Instrumentation.subscribe("signalr.onReserve", {
+   before: function(name, timestamp, payload) {
+   console.log('Recieved ', name, ' at ' + timestamp + ' with payload: ', payload);
+   controller.send('onReserve', payload);
+   },
+   after: function() {}
+   });
+   */
+			window.xappc.initSvg(model);
+			controller.set('model', model);
+		}
+	});
+});
+define("client/pods/company/level/template", ["exports"], function (exports) {
+  exports["default"] = Ember.HTMLBars.template({ "id": "zBmUFabz", "block": "{\"statements\":[[\"block\",[\"if\"],[[\"get\",[\"calendarOpen\"]]],null,0],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"myplaccsvg\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"append\",[\"helper\",[\"placc-calendar\"],null,[[\"onReserv\",\"onRelease\",\"onClose\",\"reservations\",\"ownerId\"],[[\"helper\",[\"action\"],[[\"get\",[null]],\"onReserve\"],null],[\"helper\",[\"action\"],[[\"get\",[null]],\"onRelease\"],null],[\"helper\",[\"action\"],[[\"get\",[null]],\"onCloseCalendar\"],null],[\"get\",[\"reservations\"]],[\"get\",[\"userId\"]]]]],false],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/company/level/template.hbs" } });
+});
 define('client/pods/company/route', ['exports', 'ember'], function (exports, _ember) {
 	exports['default'] = _ember['default'].Route.extend({
 		model: function model(params) {
@@ -1666,14 +1791,16 @@ define('client/pods/company/route', ['exports', 'ember'], function (exports, _em
 			if (model.get('length') === 0) {
 				this.transitionTo('index');
 			}
-			if (model.get('building.length') === 1) {
-				this.transitionTo('building', model.get('building').get('firstObject').get('id'));
-			}
+			/*
+   if(model.get('building.length')===1){
+   	this.transitionTo('building',model.get('building').get('firstObject').get('id'));
+   }
+   */
 		}
 	});
 });
 define("client/pods/company/template", ["exports"], function (exports) {
-  exports["default"] = Ember.HTMLBars.template({ "id": "wEgtqGeQ", "block": "{\"statements\":[[\"block\",[\"page-view\"],null,[[\"scrollToTop\"],[true]],3],[\"text\",\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"\\t\\t\\t\\t\\t\"],[\"open-element\",\"a\",[]],[\"static-attr\",\"href\",\"#\"],[\"static-attr\",\"class\",\"waves-effect waves-light btn accent-btn white-text\"],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"button.how_to_use\"],null],false],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"button.levels\"],null],false]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"ember-view card question-card\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-image\"],[\"dynamic-attr\",\"style\",[\"concat\",[\"background-image:url('\",[\"unknown\",[\"building\",\"img\"]],\"');\"]]],[\"flush-element\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"span\",[]],[\"static-attr\",\"class\",\"card-title question-title\"],[\"static-attr\",\"style\",\"display: block;padding: 0.7em;\"],[\"flush-element\"],[\"append\",[\"unknown\",[\"building\",\"name\"]],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-action\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"block\",[\"link-to\"],[\"building\",[\"get\",[\"building\",\"id\"]]],null,1],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[\"building\"]},{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"static-attr\",\"id\",\"index-banner\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m7\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"blockquote\",[]],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"h4\",[]],[\"flush-element\"],[\"append\",[\"unknown\",[\"model\",\"name\"]],false],[\"close-element\"],[\"text\",\"\\n    \\t\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"block\",[\"each\"],[[\"get\",[\"model\",\"building\"]]],null,2],[\"text\",\"\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m5\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"toc-wrapper\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"help-box\"],null,[[\"helpTextCode\",\"showYield\"],[\"help.company\",true]],0],[\"text\",\"\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/company/template.hbs" } });
+  exports["default"] = Ember.HTMLBars.template({ "id": "jy4WmezE", "block": "{\"statements\":[[\"block\",[\"page-view\"],null,[[\"scrollToTop\"],[true]],3],[\"text\",\"\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"Második emelet\"]],\"locals\":[]},{\"statements\":[[\"text\",\"Harmadik emelet\"]],\"locals\":[]},{\"statements\":[[\"text\",\"\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card p-card\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-image\"],[\"dynamic-attr\",\"style\",[\"concat\",[\"background-image:url('\",[\"unknown\",[\"building\",\"img\"]],\"');\"]]],[\"flush-element\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"span\",[]],[\"static-attr\",\"class\",\"card-title question-title\"],[\"static-attr\",\"style\",\"display: block;padding: 0.7em;\"],[\"flush-element\"],[\"text\",\"\\t\\n\\t\\t\\t\"],[\"open-element\",\"blockquote\",[]],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"h4\",[]],[\"flush-element\"],[\"append\",[\"unknown\",[\"model\",\"name\"]],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"append\",[\"unknown\",[\"building\",\"name\"]],false],[\"text\",\"\\n    \\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card-action\"],[\"flush-element\"],[\"text\",\"\\n\\n\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"collection\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"block\",[\"link-to\"],[\"company.level\",4],[[\"class\"],[\"collection-item\"]],1],[\"text\",\"\\n\\t\"],[\"block\",[\"link-to\"],[\"company.level\",1],[[\"class\"],[\"collection-item\"]],0],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[\"building\"]},{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"static-attr\",\"id\",\"index-banner\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m5 l3\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"each\"],[[\"get\",[\"model\",\"building\"]]],null,2],[\"text\",\"\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m7 l9\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"card p-card\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"append\",[\"unknown\",[\"outlet\"]],false],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/company/template.hbs" } });
 });
 define("client/pods/components/company-card/component", ["exports", "ember"], function (exports, _ember) {
 	exports["default"] = _ember["default"].Component.extend({
@@ -2147,7 +2274,7 @@ define('client/pods/level/route', ['exports', 'ember', 'client/utils/auth-route'
 	});
 });
 define("client/pods/level/template", ["exports"], function (exports) {
-  exports["default"] = Ember.HTMLBars.template({ "id": "6ZXVkRJX", "block": "{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"calendarOpen\"]]],null,3],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"showSVG\"]]],null,2,1],[\"close-element\"],[\"text\",\"\\n\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"    \\t\\t\"],[\"open-element\",\"a\",[]],[\"static-attr\",\"href\",\"#\"],[\"static-attr\",\"class\",\"collection-item\"],[\"modifier\",[\"action\"],[[\"get\",[null]],\"setReservation\",[\"get\",[\"seat\",\"id\"]]],[[\"preventDefault\"],[false]]],[\"flush-element\"],[\"append\",[\"unknown\",[\"seat\",\"name\"]],false],[\"text\",\" - reservations: \"],[\"append\",[\"unknown\",[\"seat\",\"reservationCount\"]],false],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[\"seat\"]},{\"statements\":[[\"text\",\"\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m7\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"blockquote\",[]],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"h4\",[]],[\"flush-element\"],[\"append\",[\"unknown\",[\"model\",\"name\"]],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"g.seats\"],[[\"count\"],[[\"get\",[\"model\",\"seat\",\"length\"]]]]],false],[\"close-element\"],[\"text\",\"\\n    \\t\\t\"],[\"close-element\"],[\"text\",\"\\n    \\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"collection\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"each\"],[[\"get\",[\"model\",\"seat\"]]],null,0],[\"text\",\"    \"],[\"comment\",\"a href=\\\"#!\\\" class=\\\"collection-item\\\"><span class=\\\"new badge\\\">4</span>Alan</a\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\n\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m5\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"toc-wrapper\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"append\",[\"unknown\",[\"post-question\"]],false],[\"text\",\"\\t\\t\\t\\t\\n\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"open-element\",\"img\",[]],[\"dynamic-attr\",\"src\",[\"concat\",[\"/assets/levels/\",[\"unknown\",[\"model\",\"id\"]],\".svg\"]]],[\"static-attr\",\"style\",\"width:100%\"],[\"flush-element\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"placc-calendar\"],null,[[\"onReserv\",\"onRelease\",\"onClose\",\"reservations\",\"ownerId\"],[[\"helper\",[\"action\"],[[\"get\",[null]],\"onReserve\"],null],[\"helper\",[\"action\"],[[\"get\",[null]],\"onRelease\"],null],[\"helper\",[\"action\"],[[\"get\",[null]],\"onCloseCalendar\"],null],[\"get\",[\"reservations\"]],[\"get\",[\"userId\"]]]]],false],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/level/template.hbs" } });
+  exports["default"] = Ember.HTMLBars.template({ "id": "0TlzsKXl", "block": "{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"section no-pad-bot\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"calendarOpen\"]]],null,5],[\"text\",\"\\n\"],[\"block\",[\"if\"],[[\"get\",[\"showSVG\"]]],null,4,1],[\"close-element\"],[\"text\",\"\\n\\n\"]],\"locals\":[],\"named\":[],\"yields\":[],\"blocks\":[{\"statements\":[[\"text\",\"    \\t\\t\"],[\"open-element\",\"a\",[]],[\"static-attr\",\"href\",\"#\"],[\"static-attr\",\"class\",\"collection-item\"],[\"modifier\",[\"action\"],[[\"get\",[null]],\"setReservation\",[\"get\",[\"seat\",\"id\"]]],[[\"preventDefault\"],[false]]],[\"flush-element\"],[\"append\",[\"unknown\",[\"seat\",\"name\"]],false],[\"text\",\" - reservations: \"],[\"append\",[\"unknown\",[\"seat\",\"reservationCount\"]],false],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[\"seat\"]},{\"statements\":[[\"text\",\"\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"container\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m7\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"blockquote\",[]],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"h4\",[]],[\"flush-element\"],[\"append\",[\"unknown\",[\"model\",\"name\"]],false],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"p\",[]],[\"flush-element\"],[\"append\",[\"helper\",[\"t\"],[\"g.seats\"],[[\"count\"],[[\"get\",[\"model\",\"seat\",\"length\"]]]]],false],[\"close-element\"],[\"text\",\"\\n    \\t\\t\"],[\"close-element\"],[\"text\",\"\\n    \\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"collection\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"block\",[\"each\"],[[\"get\",[\"model\",\"seat\"]]],null,0],[\"text\",\"    \"],[\"comment\",\"a href=\\\"#!\\\" class=\\\"collection-item\\\"><span class=\\\"new badge\\\">4</span>Alan</a\"],[\"text\",\"\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\\n\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s12 m5\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"toc-wrapper\"],[\"flush-element\"],[\"text\",\"\\n\\t\\t\\t\\t\\t\"],[\"append\",[\"unknown\",[\"post-question\"]],false],[\"text\",\"\\t\\t\\t\\t\\n\\t\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\t\\t\\t\\t\\t\\n\\t\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\\t\"],[\"close-element\"],[\"text\",\"\\n\\t\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"profile.places\"],null],false]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"t\"],[\"profile.reservations\"],null],false]],\"locals\":[]},{\"statements\":[[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"row\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s4\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"collection\"],[\"flush-element\"],[\"text\",\"\\n\\t\"],[\"block\",[\"link-to\"],[\"profile.index\"],[[\"class\"],[\"collection-item\"]],3],[\"text\",\"\\n\\t\"],[\"block\",[\"link-to\"],[\"profile.places\"],[[\"class\"],[\"collection-item\"]],2],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\\n\"],[\"close-element\"],[\"text\",\"\\n\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"col s8\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"open-element\",\"div\",[]],[\"static-attr\",\"class\",\"myplaccsvg\"],[\"flush-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\"],[\"close-element\"],[\"text\",\"\\n\"]],\"locals\":[]},{\"statements\":[[\"append\",[\"helper\",[\"placc-calendar\"],null,[[\"onReserv\",\"onRelease\",\"onClose\",\"reservations\",\"ownerId\"],[[\"helper\",[\"action\"],[[\"get\",[null]],\"onReserve\"],null],[\"helper\",[\"action\"],[[\"get\",[null]],\"onRelease\"],null],[\"helper\",[\"action\"],[[\"get\",[null]],\"onCloseCalendar\"],null],[\"get\",[\"reservations\"]],[\"get\",[\"userId\"]]]]],false],[\"text\",\"\\n\"]],\"locals\":[]}],\"hasPartials\":false}", "meta": { "moduleName": "client/pods/level/template.hbs" } });
 });
 define('client/pods/privacy/route', ['exports', 'ember'], function (exports, _ember) {
   exports['default'] = _ember['default'].Route.extend({});
@@ -2543,7 +2670,10 @@ define('client/router', ['exports', 'ember', 'client/config/environment'], funct
     this.route('admin', { path: 'admin' }, function () {
       this.route("language", { path: "language" });
     });
-    this.route('company', { path: 'company/:company_id' });
+    this.route('level', { path: 'level/:level_id' });
+    this.route('company', { path: 'company/:company_id' }, function () {
+      this.route('level', { path: 'level/:level_id' });
+    });
     this.route('activate', { path: '/activate/:code/:email' });
     this.route('errorPage');
   });
@@ -3258,7 +3388,7 @@ catch(err) {
 /* jshint ignore:start */
 
 if (!runningTests) {
-  require("client/app")["default"].create({"perPage":5,"name":"client","version":"0.0.0+0de62d4f"});
+  require("client/app")["default"].create({"perPage":5,"name":"client","version":"0.0.0+a4802f59"});
 }
 
 /* jshint ignore:end */

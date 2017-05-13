@@ -49,7 +49,7 @@ public class MailHelper {
 	
 	public static final String DEFAULT_REGISTRATION_SENDER = "attila.hogyai@gmail.com";
 	
-	public static final String[] DEFAULT_SENDER = new String[]{"message@damocles.hu","MyPlacc"};
+	public static final String[] DEFAULT_SENDER = new String[]{"noreply@myplacc.com","MyPlacc"};
 	public static class AuthProps implements Serializable{
 
 		/**
@@ -92,8 +92,8 @@ public class MailHelper {
 
 	
 	
-	public static final String INFO_MAIL_ADDRESS="info@myplacc.hu";
-	public static final String INFO_MAIL_NAME="MyFotoRoom";
+	public static final String INFO_MAIL_ADDRESS="info@myplacc.com";
+	public static final String INFO_MAIL_NAME="MyPlacc";
 	
 	
 	public static final String REGISTRATION_EMAIL="registration";

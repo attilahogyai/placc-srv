@@ -634,6 +634,24 @@ define('client/tests/pods/building/route.jshint.lint-test', ['exports'], functio
     assert.ok(true, 'pods/building/route.js should pass jshint.');
   });
 });
+define('client/tests/pods/company/level/controller.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | pods/company/level/controller.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'pods/company/level/controller.js should pass jshint.');
+  });
+});
+define('client/tests/pods/company/level/route.jshint.lint-test', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | pods/company/level/route.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'pods/company/level/route.js should pass jshint.');
+  });
+});
 define('client/tests/pods/company/route.jshint.lint-test', ['exports'], function (exports) {
   'use strict';
 

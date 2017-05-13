@@ -2157,7 +2157,7 @@ a {
 .z-depth-1-half, .btn:hover, .btn-large:hover, span.availability:hover, .accent-btn:hover, .inv-accent-btn:hover, .inv-btn:hover, .__placc-calendar__1938d_status_free:hover, .__placc-calendar__1938d_status_reserved2_my:hover, .__placc-calendar__1938d_status_reserved1:hover, .btn-floating:hover {
   box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2); }
 
-.z-depth-2 {
+.z-depth-2, .card.p-card {
   box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3); }
 
 .z-depth-3 {
@@ -6710,24 +6710,24 @@ span.marker {
 #sidenav-overlay {
   z-index: 0; }
 
-.card.q-card .card-title {
+.card.p-card .card-title {
   color: #666;
   font-family: "Roboto";
   font-weight: 300;
   font-size: 1.2em;
   line-height: 1.2em;
   vertical-align: top; }
-  .card.q-card .card-title i {
+  .card.p-card .card-title i {
     font-size: 1.2em;
     line-height: 1.2em; }
-  .card.q-card .card-title span, .card.q-card .card-title a, .card.q-card .card-title b {
+  .card.p-card .card-title span, .card.p-card .card-title a, .card.p-card .card-title b {
     vertical-align: top;
     white-space: nowrap; }
 
-.card.q-card p.icon-text {
+.card.p-card p.icon-text {
   font-size: 1rem;
   line-height: 1rem; }
-  .card.q-card p.icon-text i {
+  .card.p-card p.icon-text i {
     font-size: 1rem;
     line-height: 1rem; }
 
