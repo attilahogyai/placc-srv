@@ -1,0 +1,5 @@
+net\nicoll\boot\daemon\SpringApplicationAdminClient.class
+net\nicoll\boot\daemon\SpringBootService.class
+net\nicoll\boot\daemon\StartSpringBootService.class
+net\nicoll\boot\daemon\SpringBootDaemon.class
+net\nicoll\boot\daemon\StopSpringBootService.class
